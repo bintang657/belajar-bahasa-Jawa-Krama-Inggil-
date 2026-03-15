@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>Sinau Basa Jawa Krama Inggil</title>
     <style>
         * {
@@ -15,15 +15,11 @@
             --gold: #c9a84c;
             --gold-light: #f0d080;
             --gold-dark: #8b6914;
-            --brown-dark: #1a0a00;
-            --brown-mid: #2d1500;
-            --brown-light: #5c3317;
+            --brown-dark: #0d0500;
+            --brown-mid: #1a0a00;
+            --brown-light: #3d1f00;
             --cream: #f5e6c8;
             --cream-dark: #e8d4a0;
-            --red-batik: #8b1a1a;
-            --green-batik: #1a4a1a;
-            --purple-batik: #3d1a5c;
-            --text-light: #fff8ee;
             --shadow-gold: rgba(201, 168, 76, 0.4);
         }
 
@@ -32,392 +28,292 @@
         }
 
         body {
-            font-family: 'Georgia', serif;
-            background: var(--brown-dark);
-            color: var(--text-light);
+            font-family: Georgia, 'Times New Roman', serif;
+            background: #0d0500;
+            color: #f5e6c8;
             overflow-x: hidden;
-            cursor: none;
-        }
-
-        /* Custom Cursor */
-        .cursor {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--gold);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 99999;
-            transition: transform 0.1s ease;
-            mix-blend-mode: difference;
-        }
-
-        .cursor-dot {
-            width: 6px;
-            height: 6px;
-            background: var(--gold);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 99999;
-            transform: translate(-50%, -50%);
         }
 
         /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--brown-dark);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--gold-dark);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--gold);
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0d0500; }
+        ::-webkit-scrollbar-thumb { background: #8b6914; border-radius: 3px; }
+
+        /* ===== LOADING ===== */
+        #loadingScreen {
+            position: fixed;
+            inset: 0;
+            background: #0d0500;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease;
         }
 
-        /* ==================== CANVAS BACKGROUND ==================== */
+        #loadingScreen.gone {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .load-title {
+            font-size: 1.6rem;
+            color: #c9a84c;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .load-bar-wrap {
+            width: 220px;
+            height: 4px;
+            background: rgba(201,168,76,0.15);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .load-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #8b6914, #f0d080);
+            border-radius: 2px;
+            animation: loadBar 1.5s ease forwards;
+        }
+
+        @keyframes loadBar {
+            to { width: 100%; }
+        }
+
+        .load-sub {
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            color: rgba(201,168,76,0.5);
+            text-transform: uppercase;
+        }
+
+        /* ===== CANVAS BG ===== */
         #bgCanvas {
             position: fixed;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
             pointer-events: none;
+            display: block;
         }
 
-        /* ==================== NAVBAR ==================== */
+        /* ===== WRAPPER ===== */
+        .wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== NAVBAR ===== */
         .navbar {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            z-index: 1000;
-            padding: 15px 40px;
+            z-index: 100;
+            padding: 14px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(180deg, rgba(26,10,0,0.95) 0%, rgba(26,10,0,0) 100%);
-            backdrop-filter: blur(10px);
+            background: rgba(13,5,0,0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(201,168,76,0.08);
         }
 
         .nav-logo {
-            font-size: 1.4rem;
+            font-size: 1.1rem;
             font-weight: bold;
-            color: var(--gold);
-            text-shadow: 0 0 20px var(--shadow-gold);
+            color: #c9a84c;
             letter-spacing: 2px;
-            position: relative;
         }
 
-        .nav-logo::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--gold);
-            transition: width 0.3s ease;
-        }
-
-        .nav-logo:hover::after {
-            width: 100%;
-        }
-
-        .nav-links {
+        .nav-menu {
             display: flex;
-            gap: 30px;
-            list-style: none;
+            gap: 6px;
+            flex-wrap: wrap;
         }
 
-        .nav-links a {
-            color: var(--cream);
+        .nav-menu a {
+            color: rgba(245,230,200,0.7);
             text-decoration: none;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            position: relative;
-            transition: color 0.3s ease;
-            text-transform: uppercase;
+            font-size: 0.72rem;
+            letter-spacing: 0.5px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            border: 1px solid transparent;
         }
 
-        .nav-links a::before {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 2px;
-            background: var(--gold);
-            transition: width 0.3s ease;
+        .nav-menu a:hover {
+            color: #c9a84c;
+            border-color: rgba(201,168,76,0.3);
+            background: rgba(201,168,76,0.06);
         }
 
-        .nav-links a:hover {
-            color: var(--gold);
+        @media (max-width: 600px) {
+            .nav-menu { display: none; }
         }
 
-        .nav-links a:hover::before {
-            width: 100%;
-        }
-
-        /* ==================== HERO SECTION ==================== */
+        /* ===== HERO ===== */
         .hero {
-            position: relative;
-            z-index: 1;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 100px 20px 60px;
-            overflow: hidden;
+            padding: 100px 24px 80px;
+            position: relative;
         }
 
-        .hero-scene {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            perspective: 1000px;
-        }
-
-        .hero-3d-element {
-            position: absolute;
-            transform-style: preserve-3d;
-            animation: float3D 6s ease-in-out infinite;
-        }
-
-        .ornament-ring {
+        .hero-ring {
             position: absolute;
             border-radius: 50%;
-            border: 2px solid var(--gold);
-            opacity: 0.15;
-            animation: spinRing 20s linear infinite;
+            border: 1px solid rgba(201,168,76,0.12);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: spinRing 30s linear infinite;
         }
 
-        .ornament-ring:nth-child(1) {
-            width: 600px; height: 600px;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) rotateX(70deg);
-            animation-duration: 25s;
-        }
-
-        .ornament-ring:nth-child(2) {
-            width: 400px; height: 400px;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) rotateX(70deg) rotateZ(45deg);
-            animation-duration: 18s;
-            animation-direction: reverse;
-            opacity: 0.1;
-        }
-
-        .ornament-ring:nth-child(3) {
-            width: 800px; height: 800px;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) rotateX(70deg) rotateZ(90deg);
-            animation-duration: 30s;
-            opacity: 0.07;
-        }
+        .hero-ring:nth-child(1) { width: 500px; height: 500px; }
+        .hero-ring:nth-child(2) { width: 350px; height: 350px; animation-direction: reverse; animation-duration: 20s; }
+        .hero-ring:nth-child(3) { width: 650px; height: 650px; animation-duration: 40s; opacity: 0.6; }
 
         @keyframes spinRing {
-            from { transform: translate(-50%, -50%) rotateX(70deg) rotateZ(0deg); }
-            to { transform: translate(-50%, -50%) rotateX(70deg) rotateZ(360deg); }
-        }
-
-        @keyframes float3D {
-            0%, 100% { transform: translateY(0) rotateX(0deg); }
-            50% { transform: translateY(-20px) rotateX(5deg); }
-        }
-
-        .wayang-silhouette {
-            position: absolute;
-            width: 180px;
-            height: auto;
-            opacity: 0.12;
-            filter: sepia(1) hue-rotate(20deg);
-        }
-
-        .wayang-left {
-            left: 5%;
-            bottom: 10%;
-            transform: scaleX(-1);
-            animation: wayangFloat 7s ease-in-out infinite;
-        }
-
-        .wayang-right {
-            right: 5%;
-            bottom: 10%;
-            animation: wayangFloat 7s ease-in-out infinite 1s;
-        }
-
-        @keyframes wayangFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to   { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
         .hero-badge {
             display: inline-block;
-            padding: 8px 24px;
-            border: 1px solid var(--gold);
+            padding: 7px 22px;
+            border: 1px solid rgba(201,168,76,0.4);
             border-radius: 50px;
-            font-size: 0.8rem;
-            letter-spacing: 4px;
+            font-size: 0.72rem;
+            letter-spacing: 3px;
+            color: #c9a84c;
             text-transform: uppercase;
-            color: var(--gold);
-            margin-bottom: 20px;
-            animation: badgePulse 3s ease-in-out infinite;
+            margin-bottom: 22px;
             position: relative;
             overflow: hidden;
+            animation: fadeUp 0.8s ease forwards;
         }
 
-        .hero-badge::before {
+        .hero-badge::after {
             content: '';
             position: absolute;
             top: 0; left: -100%;
             width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
-            animation: shimmer 3s infinite;
+            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.25), transparent);
+            animation: sweep 2.5s infinite;
         }
 
-        @keyframes shimmer {
-            0% { left: -100%; }
+        @keyframes sweep {
+            0%   { left: -100%; }
             100% { left: 100%; }
         }
 
-        @keyframes badgePulse {
-            0%, 100% { box-shadow: 0 0 10px var(--shadow-gold); }
-            50% { box-shadow: 0 0 30px var(--shadow-gold), 0 0 60px var(--shadow-gold); }
-        }
-
         .hero-title {
-            font-size: clamp(2.5rem, 7vw, 5.5rem);
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 20px;
-            position: relative;
+            font-size: clamp(2.2rem, 8vw, 5rem);
+            line-height: 1.15;
+            margin-bottom: 18px;
         }
 
-        .hero-title .line1 {
+        .hero-title .t1 {
             display: block;
-            color: var(--cream);
-            opacity: 0;
-            transform: translateY(50px);
-            animation: slideUp 0.8s ease forwards 0.3s;
+            color: #f5e6c8;
+            animation: fadeUp 0.8s ease 0.2s both;
         }
 
-        .hero-title .line2 {
+        .hero-title .t2 {
             display: block;
-            background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+            background: linear-gradient(135deg, #f0d080, #c9a84c, #8b6914);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: none;
-            opacity: 0;
-            transform: translateY(50px);
-            animation: slideUp 0.8s ease forwards 0.5s;
-            position: relative;
+            animation: fadeUp 0.8s ease 0.4s both;
         }
 
-        .hero-title .line3 {
+        .hero-title .t3 {
             display: block;
-            color: var(--cream-dark);
-            font-size: 0.5em;
-            letter-spacing: 5px;
+            font-size: 0.42em;
+            letter-spacing: 6px;
+            color: rgba(245,230,200,0.55);
             text-transform: uppercase;
-            opacity: 0;
-            transform: translateY(50px);
-            animation: slideUp 0.8s ease forwards 0.7s;
+            animation: fadeUp 0.8s ease 0.6s both;
         }
 
-        @keyframes slideUp {
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        .hero-subtitle {
-            max-width: 600px;
-            font-size: 1.1rem;
+        .hero-sub {
+            max-width: 560px;
+            font-size: 1rem;
             line-height: 1.8;
-            color: rgba(245, 230, 200, 0.75);
-            margin-bottom: 40px;
-            opacity: 0;
-            animation: fadeIn 1s ease forwards 1s;
+            color: rgba(245,230,200,0.65);
+            margin-bottom: 36px;
+            animation: fadeUp 0.8s ease 0.8s both;
         }
 
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-
-        .hero-buttons {
+        .hero-btns {
             display: flex;
-            gap: 20px;
+            gap: 14px;
             flex-wrap: wrap;
             justify-content: center;
-            opacity: 0;
-            animation: fadeIn 1s ease forwards 1.2s;
+            animation: fadeUp 0.8s ease 1s both;
         }
 
-        .btn-primary {
-            padding: 16px 40px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-            color: var(--brown-dark);
+        .btn-gold {
+            padding: 14px 36px;
+            background: linear-gradient(135deg, #c9a84c, #8b6914);
+            color: #0d0500;
             border: none;
             border-radius: 50px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
             text-decoration: none;
-            position: relative;
-            overflow: hidden;
-            letter-spacing: 1px;
-            font-family: 'Georgia', serif;
+            transition: all 0.3s;
+            font-family: Georgia, serif;
+            display: inline-block;
         }
 
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 0; height: 0;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.5s ease, height 0.5s ease;
-        }
-
-        .btn-primary:hover::before {
-            width: 300px; height: 300px;
-        }
-
-        .btn-primary:hover {
+        .btn-gold:hover {
             transform: translateY(-3px);
-            box-shadow: 0 15px 40px var(--shadow-gold);
+            box-shadow: 0 12px 35px rgba(201,168,76,0.4);
         }
 
-        .btn-secondary {
-            padding: 16px 40px;
+        .btn-outline {
+            padding: 14px 36px;
             background: transparent;
-            color: var(--gold);
-            border: 2px solid var(--gold);
+            color: #c9a84c;
+            border: 2px solid #c9a84c;
             border-radius: 50px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             cursor: pointer;
-            transition: all 0.3s ease;
             text-decoration: none;
-            letter-spacing: 1px;
-            font-family: 'Georgia', serif;
+            transition: all 0.3s;
+            font-family: Georgia, serif;
+            display: inline-block;
         }
 
-        .btn-secondary:hover {
+        .btn-outline:hover {
             background: rgba(201,168,76,0.1);
             transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(201,168,76,0.2);
         }
 
-        /* Scroll indicator */
-        .scroll-indicator {
+        .scroll-hint {
             position: absolute;
             bottom: 30px;
             left: 50%;
@@ -426,269 +322,1788 @@
             flex-direction: column;
             align-items: center;
             gap: 8px;
-            opacity: 0;
-            animation: fadeIn 1s ease forwards 2s;
+            animation: fadeUp 1s ease 1.5s both;
         }
 
-        .scroll-indicator span {
-            font-size: 0.7rem;
+        .scroll-hint span {
+            font-size: 0.65rem;
             letter-spacing: 3px;
-            color: var(--gold);
+            color: rgba(201,168,76,0.5);
             text-transform: uppercase;
         }
 
         .scroll-line {
             width: 1px;
-            height: 50px;
-            background: linear-gradient(180deg, var(--gold), transparent);
-            animation: scrollLine 2s ease-in-out infinite;
+            height: 45px;
+            background: linear-gradient(180deg, #c9a84c, transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
         }
 
-        @keyframes scrollLine {
-            0% { transform: scaleY(0); transform-origin: top; }
-            50% { transform: scaleY(1); transform-origin: top; }
-            51% { transform: scaleY(1); transform-origin: bottom; }
-            100% { transform: scaleY(0); transform-origin: bottom; }
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.3; transform: scaleY(0.8); }
+            50% { opacity: 1; transform: scaleY(1); }
         }
 
-        /* ==================== STATS SECTION ==================== */
-        .stats-section {
+        /* ===== DIVIDER ===== */
+        .divider {
+            text-align: center;
+            padding: 10px 0;
             position: relative;
-            z-index: 1;
-            padding: 40px 40px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            display: inline-block;
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #c9a84c);
+            vertical-align: middle;
+            margin: 0 12px;
+        }
+
+        .divider::after {
+            background: linear-gradient(90deg, #c9a84c, transparent);
+        }
+
+        .divider-inner {
+            color: #c9a84c;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        /* ===== STATS ===== */
+        .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            padding: 40px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 600px) {
+            .stats { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .stat-card {
+            background: rgba(29,14,0,0.85);
+            border: 1px solid rgba(201,168,76,0.15);
+            border-radius: 16px;
+            padding: 24px 16px;
+            text-align: center;
+            transition: all 0.35s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(201,168,76,0.4);
+            box-shadow: 0 16px 50px rgba(0,0,0,0.4);
+        }
+
+        .stat-num {
+            display: block;
+            font-size: 2.4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #f0d080, #c9a84c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+        }
+
+        .stat-lbl {
+            font-size: 0.72rem;
+            color: rgba(245,230,200,0.55);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        /* ===== SECTION WRAPPER ===== */
+        .sec {
+            padding: 60px 20px;
             max-width: 1100px;
             margin: 0 auto;
         }
 
-        .stat-card {
-            background: linear-gradient(135deg, rgba(45,21,0,0.8), rgba(26,10,0,0.9));
-            border: 1px solid rgba(201,168,76,0.2);
-            border-radius: 20px;
-            padding: 30px;
+        .sec-head {
             text-align: center;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s ease;
-            cursor: default;
+            margin-bottom: 44px;
         }
 
-        .stat-card::before {
+        .sec-tag {
+            display: inline-block;
+            padding: 5px 18px;
+            background: rgba(201,168,76,0.08);
+            border: 1px solid rgba(201,168,76,0.25);
+            border-radius: 50px;
+            font-size: 0.68rem;
+            letter-spacing: 3px;
+            color: #c9a84c;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .sec-title {
+            font-size: clamp(1.6rem, 4vw, 2.6rem);
+            color: #f5e6c8;
+            margin-bottom: 12px;
+        }
+
+        .sec-title span {
+            background: linear-gradient(135deg, #f0d080, #c9a84c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sec-line {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #c9a84c, transparent);
+            margin: 12px auto;
+        }
+
+        .sec-desc {
+            color: rgba(245,230,200,0.58);
+            font-size: 0.95rem;
+            line-height: 1.75;
+            max-width: 540px;
+            margin: 0 auto;
+        }
+
+        /* ===== LEVEL CARDS ===== */
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .level-card {
+            background: rgba(29,14,0,0.85);
+            border: 1px solid rgba(201,168,76,0.12);
+            border-radius: 18px;
+            padding: 28px 20px;
+            text-align: center;
+            transition: all 0.35s;
+            cursor: pointer;
+        }
+
+        .level-card:hover, .level-card.active-lv {
+            transform: translateY(-6px);
+            border-color: #c9a84c;
+            box-shadow: 0 0 30px rgba(201,168,76,0.15);
+        }
+
+        .lv-ring-wrap {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 18px;
+        }
+
+        .lv-ring-wrap svg {
+            width: 80px;
+            height: 80px;
+            transform: rotate(-90deg);
+        }
+
+        .lv-bg { fill: none; stroke: rgba(201,168,76,0.1); stroke-width: 5; }
+        .lv-fill { fill: none; stroke: #c9a84c; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 220; transition: stroke-dashoffset 1.2s ease; }
+
+        .lv-pct {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #c9a84c;
+        }
+
+        .lv-name {
+            font-size: 1rem;
+            color: #f5e6c8;
+            margin-bottom: 6px;
+        }
+
+        .lv-desc {
+            font-size: 0.75rem;
+            color: rgba(245,230,200,0.45);
+            line-height: 1.55;
+        }
+
+        /* ===== VOCAB GRID ===== */
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 18px;
+        }
+
+        .vocab-card {
+            background: rgba(29,14,0,0.9);
+            border: 1px solid rgba(201,168,76,0.13);
+            border-radius: 18px;
+            padding: 26px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.35s;
+            cursor: pointer;
+        }
+
+        .vocab-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(201,168,76,0.38);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+        }
+
+        .vc-cat {
+            font-size: 0.65rem;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: rgba(201,168,76,0.65);
+            margin-bottom: 10px;
+        }
+
+        .vc-jawa {
+            font-size: 1.7rem;
+            font-weight: bold;
+            color: #f0d080;
+            margin-bottom: 6px;
+            text-shadow: 0 0 15px rgba(201,168,76,0.2);
+        }
+
+        .vc-indo {
+            font-size: 0.95rem;
+            color: #f5e6c8;
+            margin-bottom: 6px;
+        }
+
+        .vc-ngoko {
+            font-size: 0.8rem;
+            color: rgba(245,230,200,0.45);
+            font-style: italic;
+            margin-bottom: 14px;
+        }
+
+        .vc-ngoko span { color: rgba(201,168,76,0.6); }
+
+        .vc-num {
+            position: absolute;
+            bottom: 14px; right: 18px;
+            font-size: 2.6rem;
+            font-weight: 900;
+            color: rgba(201,168,76,0.05);
+            line-height: 1;
+        }
+
+        .speak-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 16px;
+            background: rgba(201,168,76,0.08);
+            border: 1px solid rgba(201,168,76,0.25);
+            border-radius: 50px;
+            font-size: 0.76rem;
+            color: #c9a84c;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: Georgia, serif;
+        }
+
+        .speak-btn:hover {
+            background: rgba(201,168,76,0.18);
+        }
+
+        .play-tri {
+            width: 0; height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 9px solid #c9a84c;
+            display: inline-block;
+        }
+
+        /* ===== TATA KRAMA ===== */
+        .tata-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .tata-card {
+            background: rgba(29,14,0,0.88);
+            border: 1px solid rgba(201,168,76,0.13);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.35s;
+        }
+
+        .tata-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(201,168,76,0.35);
+        }
+
+        .tata-icon-box {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #8b6914, #3d1f00);
+            border: 1px solid rgba(201,168,76,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+
+        .tata-icon-box svg {
+            width: 26px; height: 26px;
+            fill: #c9a84c;
+        }
+
+        .tata-title {
+            font-size: 1.1rem;
+            color: #f0d080;
+            margin-bottom: 10px;
+        }
+
+        .tata-desc {
+            font-size: 0.86rem;
+            color: rgba(245,230,200,0.6);
+            line-height: 1.7;
+            margin-bottom: 18px;
+        }
+
+        .tata-ex {
+            background: rgba(201,168,76,0.05);
+            border-left: 3px solid #c9a84c;
+            border-radius: 0 10px 10px 0;
+            padding: 14px 18px;
+        }
+
+        .tata-ex-lbl {
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            color: #c9a84c;
+            text-transform: uppercase;
+            margin-bottom: 7px;
+        }
+
+        .tata-ex-txt {
+            font-size: 0.88rem;
+            color: #f5e6c8;
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        /* ===== AKSARA ===== */
+        .aksara-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+        }
+
+        .aksara-card {
+            background: rgba(29,14,0,0.88);
+            border: 1px solid rgba(201,168,76,0.13);
+            border-radius: 14px;
+            padding: 18px 12px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .aksara-card:hover {
+            transform: translateY(-5px) scale(1.05);
+            border-color: rgba(201,168,76,0.4);
+        }
+
+        .aksara-ch {
+            display: block;
+            font-size: 1.6rem;
+            color: #f0d080;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        .aksara-lt {
+            display: block;
+            font-size: 0.75rem;
+            color: #f5e6c8;
+            margin-bottom: 3px;
+        }
+
+        .aksara-mn {
+            display: block;
+            font-size: 0.65rem;
+            color: rgba(201,168,76,0.55);
+        }
+
+        /* ===== DIALOG ===== */
+        .dlg-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .dlg-tab {
+            padding: 9px 22px;
+            border: 1px solid rgba(201,168,76,0.2);
+            border-radius: 50px;
+            background: transparent;
+            color: rgba(245,230,200,0.55);
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-family: Georgia, serif;
+            transition: all 0.3s;
+        }
+
+        .dlg-tab.active, .dlg-tab:hover {
+            background: rgba(201,168,76,0.1);
+            border-color: #c9a84c;
+            color: #c9a84c;
+        }
+
+        .dlg-pane { display: none; }
+        .dlg-pane.active {
+            display: block;
+            animation: fadeIn 0.35s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bubble-wrap {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 18px;
+            align-items: flex-start;
+        }
+
+        .bubble-wrap.right { flex-direction: row-reverse; }
+
+        .avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            flex-shrink: 0;
+            border: 2px solid rgba(201,168,76,0.25);
+        }
+
+        .av-a { background: linear-gradient(135deg, #8b6914, #3d1f00); color: #f0d080; }
+        .av-b { background: linear-gradient(135deg, #3d1a5c, #1a0a30); color: #c0a0e0; border-color: rgba(160,100,220,0.25); }
+
+        .bubble-body { max-width: 72%; }
+
+        .bubble-name {
+            font-size: 0.7rem;
+            color: #c9a84c;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .bubble-wrap.right .bubble-name {
+            text-align: right;
+            color: #c0a0e0;
+        }
+
+        .bubble-text {
+            background: rgba(29,14,0,0.9);
+            border: 1px solid rgba(201,168,76,0.13);
+            border-radius: 4px 16px 16px 16px;
+            padding: 14px 18px;
+        }
+
+        .bubble-wrap.right .bubble-text {
+            border-radius: 16px 4px 16px 16px;
+            background: rgba(61,26,92,0.35);
+            border-color: rgba(160,100,220,0.13);
+        }
+
+        .bubble-jawa {
+            font-size: 0.95rem;
+            color: #f5e6c8;
+            margin-bottom: 5px;
+            line-height: 1.6;
+        }
+
+        .bubble-trans {
+            font-size: 0.78rem;
+            color: rgba(245,230,200,0.45);
+            font-style: italic;
+        }
+
+        /* ===== TIPS ===== */
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+        }
+
+        .tip-card {
+            background: rgba(29,14,0,0.85);
+            border: 1px solid rgba(201,168,76,0.1);
+            border-radius: 18px;
+            padding: 26px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.35s;
+        }
+
+        .tip-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(201,168,76,0.28);
+        }
+
+        .tip-num {
+            position: absolute;
+            top: 12px; right: 18px;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: rgba(201,168,76,0.05);
+            line-height: 1;
+        }
+
+        .tip-lbl {
+            font-size: 0.66rem;
+            letter-spacing: 2.5px;
+            color: #c9a84c;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            opacity: 0.75;
+        }
+
+        .tip-title {
+            font-size: 1.05rem;
+            color: #f0d080;
+            margin-bottom: 10px;
+        }
+
+        .tip-text {
+            font-size: 0.84rem;
+            color: rgba(245,230,200,0.58);
+            line-height: 1.7;
+        }
+
+        /* ===== QUIZ ===== */
+        .quiz-wrap { max-width: 680px; margin: 0 auto; }
+
+        .quiz-box {
+            background: rgba(22,10,0,0.96);
+            border: 1px solid rgba(201,168,76,0.2);
+            border-radius: 24px;
+            padding: 36px 28px;
+            position: relative;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+        }
+
+        .quiz-box::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 3px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
-            transform: scaleX(0);
-            transition: transform 0.4s ease;
+            background: linear-gradient(90deg, #8b6914, #f0d080, #8b6914);
+            border-radius: 24px 24px 0 0;
         }
 
-        .stat-card:hover::before {
-            transform: scaleX(1);
+        .qprog {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
         }
 
-        .stat-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            border-color: rgba(201,168,76,0.5);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px var(--shadow-gold);
-        }
+        .qprog-txt { font-size: 0.8rem; color: #c9a84c; letter-spacing: 1.5px; white-space: nowrap; }
 
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(201,168,76,0.05) 0%, transparent 60%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .stat-card:hover::after {
-            opacity: 1;
-        }
-
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, var(--gold-light), var(--gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            color: rgba(245,230,200,0.6);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        /* ==================== SECTION GENERIC ==================== */
-        .section {
-            position: relative;
-            z-index: 1;
-            padding: 80px 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .section-tag {
-            display: inline-block;
-            padding: 5px 20px;
+        .qprog-bar {
+            flex: 1;
+            height: 5px;
             background: rgba(201,168,76,0.1);
-            border: 1px solid rgba(201,168,76,0.3);
-            border-radius: 50px;
-            font-size: 0.75rem;
-            letter-spacing: 3px;
-            color: var(--gold);
-            text-transform: uppercase;
-            margin-bottom: 15px;
-        }
-
-        .section-title {
-            font-size: clamp(1.8rem, 4vw, 3rem);
-            color: var(--cream);
-            margin-bottom: 15px;
-            position: relative;
-        }
-
-        .section-title span {
-            background: linear-gradient(135deg, var(--gold-light), var(--gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .section-line {
-            width: 80px;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
-            margin: 15px auto;
-            border-radius: 2px;
-        }
-
-        .section-desc {
-            color: rgba(245,230,200,0.65);
-            font-size: 1rem;
-            line-height: 1.8;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* ==================== KOSAKATA SECTION ==================== */
-        .vocab-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-        }
-
-        .vocab-card {
-            background: linear-gradient(135deg, rgba(45,21,0,0.9), rgba(26,10,0,0.95));
-            border: 1px solid rgba(201,168,76,0.15);
-            border-radius: 20px;
-            padding: 30px;
-            position: relative;
+            border-radius: 3px;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            transform-style: preserve-3d;
         }
 
-        .vocab-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(201,168,76,0.05), transparent);
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        .qprog-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b6914, #c9a84c);
+            border-radius: 3px;
+            transition: width 0.4s ease;
         }
 
-        .vocab-card:hover::before {
-            opacity: 1;
+        .qscore {
+            font-size: 0.78rem;
+            color: #f5e6c8;
+            background: rgba(201,168,76,0.08);
+            padding: 4px 14px;
+            border-radius: 50px;
+            border: 1px solid rgba(201,168,76,0.18);
+            white-space: nowrap;
         }
 
-        .vocab-card:hover {
-            transform: translateY(-10px) rotateX(5deg);
-            border-color: rgba(201,168,76,0.4);
-            box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 40px rgba(201,168,76,0.1);
-        }
-
-        .vocab-category {
+        .q-lbl {
             font-size: 0.7rem;
-            letter-spacing: 3px;
+            letter-spacing: 2.5px;
+            color: rgba(201,168,76,0.65);
             text-transform: uppercase;
-            color: var(--gold);
-            opacity: 0.7;
             margin-bottom: 12px;
         }
 
-        .vocab-jawa {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--gold-light);
+        .q-text {
+            font-size: 1.25rem;
+            color: #f5e6c8;
             margin-bottom: 8px;
-            text-shadow: 0 0 20px rgba(201,168,76,0.3);
+            line-height: 1.45;
         }
 
-        .vocab-indonesia {
-            font-size: 1rem;
-            color: var(--cream);
-            margin-bottom: 8px;
-        }
-
-        .vocab-ngoko {
-            font-size: 0.85rem;
-            color: rgba(245,230,200,0.5);
+        .q-sub {
+            font-size: 0.84rem;
+            color: rgba(245,230,200,0.45);
             font-style: italic;
+            margin-bottom: 28px;
         }
 
-        .vocab-ngoko span {
-            color: rgba(201,168,76,0.6);
-        }
+        .q-opts { display: grid; gap: 12px; margin-bottom: 22px; }
 
-        .vocab-card-accent {
-            position: absolute;
-            top: 0; right: 0;
-            width: 100px; height: 100px;
-            background: radial-gradient(circle, rgba(201,168,76,0.08), transparent);
-            border-radius: 50%;
-            transform: translate(30px, -30px);
-        }
-
-        .vocab-card-number {
-            position: absolute;
-            bottom: 15px; right: 20px;
-            font-size: 3rem;
-            font-weight: 900;
-            color: rgba(201,168,76,0.06);
-            line-height: 1;
-        }
-
-        .play-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 15px;
-            padding: 8px 18px;
-            background: rgba(201,168,76,0.1);
-            border: 1px solid rgba(201,168,76,0.3);
-            border-radius: 50px;
-            font-size: 0.8rem;
-            color: var(--gold);
+        .q-opt {
+            padding: 16px 20px;
+            background: rgba(201,168,76,0.03);
+            border: 1px solid rgba(201,168,76,0.14);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: #f5e6c8;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Georgia', serif;
+            transition: all 0.28s;
+            text-align: left;
+            font-family: Georgia, serif;
         }
 
-        .play-btn:hover {
-            background: rgba(201,168,76,0.2);
-     
+        .q-opt:hover:not(:disabled) {
+            border-color: rgba(201,168,76,0.4);
+            background: rgba(201,168,76,0.08);
+            color: #f0d080;
+            transform: translateX(4px);
+        }
+
+        .q-opt.ok { background: rgba(26,74,26,0.35); border-color: #4a9a4a; color: #90d890; }
+        .q-opt.no { background: rgba(139,26,26,0.35); border-color: #9a4a4a; color: #d89090; }
+        .q-opt:disabled { cursor: not-allowed; }
+
+        .q-fb {
+            padding: 14px 18px;
+            border-radius: 10px;
+            font-size: 0.86rem;
+            line-height: 1.6;
+            margin-bottom: 18px;
+            display: none;
+        }
+
+        .q-fb.show { display: block; animation: fadeIn 0.3s ease; }
+        .q-fb.ok { background: rgba(26,74,26,0.28); border: 1px solid rgba(74,154,74,0.35); color: #90d890; }
+        .q-fb.no { background: rgba(139,26,26,0.28); border: 1px solid rgba(154,74,74,0.35); color: #d89090; }
+
+        .q-next {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #c9a84c, #8b6914);
+            color: #0d0500;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: Georgia, serif;
+        }
+
+        .q-next:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(201,168,76,0.35);
+        }
+
+        .q-next:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        /* result */
+        .q-result { text-align: center; padding: 16px 0; }
+        .qr-label { font-size: 0.72rem; letter-spacing: 3px; color: #c9a84c; text-transform: uppercase; margin-bottom: 12px; }
+        .qr-grade { font-size: 1.8rem; color: #f0d080; margin-bottom: 10px; }
+        .qr-pct {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #f0d080, #c9a84c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .qr-raw { color: rgba(245,230,200,0.45); font-size: 0.88rem; margin-bottom: 12px; }
+        .qr-msg { color: rgba(245,230,200,0.68); font-size: 0.95rem; line-height: 1.6; margin-bottom: 28px; }
+
+        /* ===== NOTIFICATION ===== */
+        .notif {
+            position: fixed;
+            top: 80px; right: 20px;
+            padding: 13px 22px;
+            border-radius: 10px;
+            font-size: 0.86rem;
+            z-index: 9999;
+            transform: translateX(110%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 280px;
+            line-height: 1.5;
+        }
+
+        .notif.show { transform: translateX(0); }
+        .notif.success { background: rgba(20,60,20,0.95); border: 1px solid rgba(74,154,74,0.45); color: #90d890; }
+        .notif.error { background: rgba(100,20,20,0.95); border: 1px solid rgba(154,74,74,0.45); color: #d89090; }
+        .notif.info { background: rgba(20,20,80,0.95); border: 1px solid rgba(74,74,180,0.45); color: #a0a0e8; }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            padding: 50px 24px 36px;
+            border-top: 1px solid rgba(201,168,76,0.08);
+            background: rgba(13,5,0,0.7);
+        }
+
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 36px;
+            margin-bottom: 36px;
+        }
+
+        .footer-brand h3 { font-size: 1.3rem; color: #c9a84c; margin-bottom: 10px; }
+        .footer-brand p { color: rgba(245,230,200,0.45); font-size: 0.84rem; line-height: 1.7; }
+
+        .footer-col h4 { color: #f0d080; margin-bottom: 14px; font-size: 0.9rem; }
+        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .footer-col a { color: rgba(245,230,200,0.45); text-decoration: none; font-size: 0.84rem; transition: color 0.3s; }
+        .footer-col a:hover { color: #c9a84c; }
+
+        .footer-bottom {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding-top: 24px;
+            border-top: 1px solid rgba(201,168,76,0.07);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .footer-bottom p { color: rgba(245,230,200,0.3); font-size: 0.78rem; }
+        .footer-orn { color: #c9a84c; opacity: 0.35; letter-spacing: 4px; }
+
+        /* ===== REVEAL ===== */
+        .rv {
+            opacity: 0;
+            transform: translateY(32px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .rv.show { opacity: 1; transform: translateY(0); }
+        .rv.d1 { transition-delay: 0.1s; }
+        .rv.d2 { transition-delay: 0.2s; }
+        .rv.d3 { transition-delay: 0.3s; }
+        .rv.d4 { transition-delay: 0.4s; }
+        .rv.d5 { transition-delay: 0.5s; }
+
+        /* ===== BG SECTION ALT ===== */
+        .bg-alt {
+            background: rgba(29,14,0,0.25);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loadingScreen">
+    <div class="load-title">SINAU BASA JAWA</div>
+    <div class="load-bar-wrap"><div class="load-bar"></div></div>
+    <div class="load-sub">Ngatur Kawruh...</div>
+</div>
+
+<!-- Notification -->
+<div class="notif" id="notif"></div>
+
+<!-- Canvas BG -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- Main wrapper -->
+<div class="wrapper">
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-logo">Sinau Basa Jawa</div>
+        <div class="nav-menu">
+            <a href="#kosakata">Kosakata</a>
+            <a href="#tatakrama">Tata Krama</a>
+            <a href="#aksara">Aksara</a>
+            <a href="#dialog">Dialog</a>
+            <a href="#kuis">Kuis</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="home">
+        <div class="hero-ring"></div>
+        <div class="hero-ring"></div>
+        <div class="hero-ring"></div>
+
+        <div class="hero-badge">Platform Pembelajaran</div>
+
+        <h1 class="hero-title">
+            <span class="t1">Sinau</span>
+            <span class="t2">Basa Jawa</span>
+            <span class="t3">Krama Inggil</span>
+        </h1>
+
+        <p class="hero-sub">
+            Pelajari Bahasa Jawa Krama Inggil dengan cara yang menyenangkan dan interaktif.
+            Dari kosakata dasar hingga ungkapan sopan dalam kehidupan sehari-hari.
+        </p>
+
+        <div class="hero-btns">
+            <a href="#kosakata" class="btn-gold">Mulai Belajar</a>
+            <a href="#kuis" class="btn-outline">Coba Kuis</a>
+        </div>
+
+        <div class="scroll-hint">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <div class="stats">
+        <div class="stat-card rv">
+            <span class="stat-num" data-target="150">0</span>
+            <span class="stat-lbl">Kosakata</span>
+        </div>
+        <div class="stat-card rv d1">
+            <span class="stat-num" data-target="20">0</span>
+            <span class="stat-lbl">Dialog Percakapan</span>
+        </div>
+        <div class="stat-card rv d2">
+            <span class="stat-num" data-target="50">0</span>
+            <span class="stat-lbl">Soal Kuis</span>
+        </div>
+        <div class="stat-card rv d3">
+            <span class="stat-num" data-target="3">0</span>
+            <span class="stat-lbl">Tingkat Kesulitan</span>
+        </div>
+    </div>
+
+    <div class="divider"><span class="divider-inner">&#9670;</span></div>
+
+    <!-- LEVEL -->
+    <section class="sec" id="level">
+        <div class="sec-head">
+            <div class="sec-tag">Pilih Tingkatan</div>
+            <h2 class="sec-title">Tingkat <span>Pembelajaran</span></h2>
+            <div class="sec-line"></div>
+            <p class="sec-desc">Mulai dari tingkat dasar dan tingkatkan kemampuan secara bertahap</p>
+        </div>
+        <div class="level-grid">
+            <div class="level-card active-lv rv" onclick="pickLevel(this,'pemula')">
+                <div class="lv-ring-wrap">
+                    <svg viewBox="0 0 80 80">
+                        <circle class="lv-bg" cx="40" cy="40" r="34"/>
+                        <circle class="lv-fill" cx="40" cy="40" r="34" stroke-dashoffset="147"/>
+                    </svg>
+                    <div class="lv-pct">33%</div>
+                </div>
+                <div class="lv-name">Pemula</div>
+                <div class="lv-desc">Kosakata dasar dan sapaan sederhana dalam Krama Inggil</div>
+            </div>
+            <div class="level-card rv d1" onclick="pickLevel(this,'menengah')">
+                <div class="lv-ring-wrap">
+                    <svg viewBox="0 0 80 80">
+                        <circle class="lv-bg" cx="40" cy="40" r="34"/>
+                        <circle class="lv-fill" cx="40" cy="40" r="34" stroke-dashoffset="77"/>
+                    </svg>
+                    <div class="lv-pct">66%</div>
+                </div>
+                <div class="lv-name">Menengah</div>
+                <div class="lv-desc">Kalimat lengkap, ungkapan formal, dan tata bahasa</div>
+            </div>
+            <div class="level-card rv d2" onclick="pickLevel(this,'mahir')">
+                <div class="lv-ring-wrap">
+                    <svg viewBox="0 0 80 80">
+                        <circle class="lv-bg" cx="40" cy="40" r="34"/>
+                        <circle class="lv-fill" cx="40" cy="40" r="34" stroke-dashoffset="0"/>
+                    </svg>
+                    <div class="lv-pct">100%</div>
+                </div>
+                <div class="lv-name">Mahir</div>
+                <div class="lv-desc">Percakapan kompleks, sastra Jawa, dan budaya mendalam</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"><span class="divider-inner">&#9670;</span></div>
+
+    <!-- KOSAKATA -->
+    <section class="sec" id="kosakata">
+        <div class="sec-head">
+            <div class="sec-tag">Perbendaharaan Kata</div>
+            <h2 class="sec-title">Kosakata <span>Krama Inggil</span></h2>
+            <div class="sec-line"></div>
+            <p class="sec-desc">Pelajari kosakata penting beserta padanan Ngoko-nya</p>
+        </div>
+        <div class="vocab-grid" id="vocabGrid"></div>
+    </section>
+
+    <div class="divider"><span class="divider-inner">&#9670;</span></div>
+
+    <!-- TATA KRAMA -->
+    <div class="bg-alt">
+    <section class="sec" id="tatakrama">
+        <div class="sec-head">
+            <div class="sec-tag">Sopan Santun</div>
+            <h2 class="sec-title">Tata <span>Krama</span></h2>
+            <div class="sec-line"></div>
+            <p class="sec-desc">Panduan penggunaan Krama Inggil dalam konteks yang tepat</p>
+        </div>
+        <div class="tata-grid">
+
+            <div class="tata-card rv">
+                <div class="tata-icon-box">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <h3 class="tata-title">Kapan Menggunakan Krama Inggil</h3>
+                <p class="tata-desc">Krama Inggil digunakan untuk menghormati lawan bicara yang lebih tua, lebih tinggi statusnya, atau dalam situasi formal seperti upacara adat dan pertemuan resmi.</p>
+                <div class="tata-ex">
+                    <div class="tata-ex-lbl">Situasi Tepat</div>
+                    <div class="tata-ex-txt">Berbicara dengan orang tua, guru, pejabat, atau tokoh masyarakat yang dihormati.</div>
+                </div>
+            </div>
+
+            <div class="tata-card rv d1">
+                <div class="tata-icon-box">
+                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+                <h3 class="tata-title">Kata Ganti Orang</h3>
+                <p class="tata-desc">Dalam Krama Inggil, kata ganti harus disesuaikan. "Kula" untuk diri sendiri, "Panjenengan" untuk lawan bicara yang dihormati.</p>
+                <div class="tata-ex">
+                    <div class="tata-ex-lbl">Contoh Penggunaan</div>
+                    <div class="tata-ex-txt">"Kula badhe nyuwun pangapunten" - Saya ingin meminta maaf</div>
+                </div>
+            </div>
+
+            <div class="tata-card rv d2">
+                <div class="tata-icon-box">
+                    <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+                </div>
+                <h3 class="tata-title">Struktur Kalimat Hormat</h3>
+                <p class="tata-desc">Kalimat dalam Krama Inggil memiliki struktur khas. Kata kerja dan kata benda memiliki bentuk khusus yang berbeda dari Ngoko maupun Krama Madya.</p>
+                <div class="tata-ex">
+                    <div class="tata-ex-lbl">Perbandingan Ragam</div>
+                    <div class="tata-ex-txt">Ngoko: "mangan" - Krama: "nedha" - Krama Inggil: "dhahar"</div>
+                </div>
+            </div>
+
+            <div class="tata-card rv d3">
+                <div class="tata-icon-box">
+                    <svg viewBox="0 0 24 24"><path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-2h2v2zm0-4h-2c0-3.25 3-3 3-5 0-1.1-.9-2-2-2s-2 .9-2 2h-2c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.5-3 2.75-3 5z"/></svg>
+                </div>
+                <h3 class="tata-title">Perbedaan Tingkatan Bahasa</h3>
+                <p class="tata-desc">Bahasa Jawa memiliki tiga tingkatan utama: Ngoko (kasar/akrab), Krama Madya (menengah), dan Krama Inggil (halus/hormat). Setiap tingkatan memiliki kosakata yang berbeda.</p>
+                <div class="tata-ex">
+                    <div class="tata-ex-lbl">Contoh Tingkatan</div>
+                    <div class="tata-ex-txt">Ngoko: "mangan" - Krama Madya: "nedha" - Krama Inggil: "dhahar"</div>
+                </div>
+            </div>
+
+            <div class="tata-card rv d4">
+                <div class="tata-icon-box">
+                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                </div>
+                <h3 class="tata-title">Sapaan dan Salam</h3>
+                <p class="tata-desc">Membuka percakapan dengan sapaan yang tepat sangat penting dalam budaya Jawa. Salam mencerminkan rasa hormat dan keramahan kepada lawan bicara.</p>
+                <div class="tata-ex">
+                    <div class="tata-ex-lbl">Contoh Sapaan</div>
+                    <div class="tata-ex-txt">"Sugeng enjang, Bapak. Kadospundi kabaripun?" - Selamat pagi, Bapak. Bagaimana kabarnya?</div>
+                </div>
+            </div>
+
+            <div class="tata-card rv d5">
+                <div class="tata-icon-box">
+                    <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                </div>
+                <h3 class="tata-title">Ekspresi Rasa Syukur</h3>
+                <p class="tata-desc">Mengucapkan terima kasih dengan cara yang benar menunjukkan kepribadian yang baik dan menghargai kebaikan orang lain dalam tradisi Jawa.</p>
+                <div class="tata-ex">
+                    <div class="tata-ex-lbl">Contoh Ungkapan</div>
+                    <div class="tata-ex-txt">"Matur nuwun sanget, Ibu. Mugi-mugi Gusti Allah paring ganjaran." - Terima kasih banyak, Bu.</div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+    </div>
+
+    <div class="divider"><span class="divider-inner">&#9670;</span></div>
+
+    <!-- AKSARA -->
+    <section class="sec" id="aksara">
+        <div class="sec-head">
+            <div class="sec-tag">Tulisan Kuno</div>
+            <h2 class="sec-title">Aksara <span>Jawa</span></h2>
+            <div class="sec-line"></div>
+            <p class="sec-desc">Kenali huruf-huruf dalam aksara Jawa yang menjadi warisan budaya leluhur</p>
+        </div>
+        <div class="aksara-grid" id="aksaraGrid"></div>
+    </section>
+
+    <div class="divider"><span class="divider-inner">&#9670;</span></div>
+
+    <!-- DIALOG -->
+    <div class="bg-alt">
+    <section class="sec" id="dialog">
+        <div class="sec-head">
+            <div class="sec-tag">Latihan Percakapan</div>
+            <h2 class="sec-title">Dialog <span>Sehari-hari</span></h2>
+            <div class="sec-line"></div>
+            <p class="sec-desc">Contoh percakapan dalam berbagai situasi menggunakan Krama Inggil</p>
+        </div>
+
+        <div style="max-width:720px;margin:0 auto;">
+            <div class="dlg-tabs">
+                <button class="dlg-tab active" onclick="showDlg('greet',this)">Sapaan</button>
+                <button class="dlg-tab" onclick="showDlg('formal',this)">Formal</button>
+                <button class="dlg-tab" onclick="showDlg('daily',this)">Sehari-hari</button>
+                <button class="dlg-tab" onclick="showDlg('farewell',this)">Pamitan</button>
+            </div>
+
+            <!-- Sapaan -->
+            <div class="dlg-pane active" id="dlg-greet">
+                <div class="bubble-wrap">
+                    <div class="avatar av-a">R</div>
+                    <div class="bubble-body">
+                        <div class="bubble-name">Raka</div>
+                        <div class="bubble-text">
+                            <div class="bubble-jawa">Sugeng enjang, Bapak Suharto. Kadospundi kabaripun panjenengan?</div>
+                            <div class="bubble-trans">Selamat pagi, Bapak Suharto. Bagaimana kabar Anda?</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bubble-wrap right">
+                    <div class="avatar av-b">S</div>
+                    <div class="bubble-body">
+                        <div class="bubble-name">Bapak Suharto</div>
+                        <div class="bubble-text">
+                            <div class="bubble-jawa">Sugeng enjang, Nak Raka. Alhamdulillah kula sae kemawon. Panjenengan piyambak kadospundi?</div>
+                            <div class="bubble-trans">Selamat pagi, Nak Raka. Alhamdulillah saya baik-baik saja. Anda sendiri bagaimana?</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bubble-wrap">
+                    <div class="avatar av-a">R</div>
+                    <div class="bubble-body">
+                        <div class="bubble-name">Raka</div>
+                        <div class="bubble-text">
+                            <div class="bubble-jawa">Kula ugi sae, matur nuwun. Mugi panjenengan tansah pinaringan sehat.</div>
+                            <div class="bubble-trans">Saya juga baik, terima kasih. Semoga Anda selalu diberi kesehatan.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formal -->
+            <div class="dlg-pane" id="dlg-formal">
+                <div class="bubble-wrap">
+                    <div class="avatar av-a">W</div>
+                    <div class="bubble-body">
+                        <div class="bubble-name">Wahyu</div>
+                        <div class="bubble-text">
+                            <div class="bubble-jawa">Nyuwun pangapunten, Bapak Lurah. Kula badhe nyuwun pirsa bab prosedur ingkang kedah dipuntindakaken.</div>
+                            <div class="bubble-trans">Mohon maaf, Bapak Lurah. Saya ingin menanyakan tentang prosedur yang harus dilakukan.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bubble-wrap right">
+                    <div class="avatar av-b">L</div>
+                    <div class="bubble-body">
+                        <div class="bubble-name">Bapak Lurah</div>
+                        <div class="bubble-text">
+                            <div class="bubble-jawa">Inggih, mangga lenggah rumiyin. Wonten ingkang saged kula biyantu?</div>
+                            <div class="bubble-trans">Ya, silakan duduk dulu. Ada yang bisa saya bantu?</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bubble-wrap">
+                    <div class="avatar av-a">W</div>
+                    <div class="bubble-body">
+                        <div class="bubble-name">Wahyu</div>
+                        <div class="bubble-text">
+                            <div class="bubble-jawa">Matur nuwun, Bapak. Kula badhe ngurus surat keterangan domisili. Menapa kemawon syaratipun?</div>
+                            <div class="bubble-trans">Terima kasih, Bapak. Saya mau mengurus surat keterangan domisili. Apa saja syaratnya?</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sehari-hari -->
+            <div class="dlg-pane" id="dlg-daily">
+                <div class="bubble-wrap">
+                    <div class="avatar av-a">D</div>
+                    <div class="bubble-body">
+                        <div class="bubble-name">Dewi</div>
+                        <div class="bubble-text">
+                            <div class="bubble-jawa">Sugeng siyang, Ibu. Panjenengan nembe saking pundi?</div>
+                            <div class="bubble-trans">Selamat siang, Ibu. Anda baru dari mana?</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bubble-wrap right">
+                    <div class="avatar av-b">I</div>
+                    <div class="bubble-body">
+                        <div class="bubble-name">Ibu Sri</div>
+                        <div class="bubble-text">
+                            <div class="bubble-jawa">Saking pasar, Nduk. Kula nembe tumbas sayuran. Panjenengan badhe tindak pundi?</div>
+                            <div class="bubble-trans">Dari pasar, Nduk. Saya baru beli sayuran. Anda mau pergi ke mana?</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bubble-wrap">
+                    <div class="avatar av-a">D</div>
+                    <div class="bubble-body">
+                        <div class="bubble-name">Dewi</div>
+                        <div class="bubble-text">
+                            <div class="bubble-jawa">Kula badhe sowan dateng griyane Mbah Putri. Mangke kula nyuwun pamit rumiyin.</div>
+                            <div class="bubble-trans">Saya mau mengunjungi rumah Nenek. Nanti saya pamit dulu.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pamitan -->
+            <div class="dlg-pane" id="dlg-farewell">
+                <div class="bubble-wrap">
+                    <div class="avatar av-a">A</div>
+                    <div class="bubble-body">
+                        <div class="bubble-name">Andi</div>
+                        <div class="bubble-text">
+                            <div class="bubble-jawa">Bapak, kula nyuwun pamit badhe wangsul. Sampun dalu.</div>
+                            <div class="bubble-trans">Bapak, saya minta izin untuk pulang. Sudah malam.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bubble-wrap right">
+                    <div class="avatar av-b">B</div>
+                    <div class="bubble-body">
+                        <div class="bubble-name">Bapak Hadi</div>
+                        <div class="bubble-text">
+                            <div class="bubble-jawa">Inggih, ngatos-atos ing margi. Mugi panjenengan tansah pinaringan slamet lan sehat.</div>
+                            <div class="bubble-trans">Ya, hati-hati di jalan. Semoga Anda selalu diberi keselamatan dan kesehatan.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bubble-wrap">
+                    <div class="avatar av-a">A</div>
+                    <div class="bubble-body">
+                        <div class="bubble-name">Andi</div>
+                        <div class="bubble-text">
+                            <div class="bubble-jawa">Aamiin. Matur nuwun sanget, Bapak. Mugi-mugi kita saged kepanggih malih.</div>
+                            <div class="bubble-trans">Aamiin. Terima kasih banyak, Bapak. Semoga kita bisa bertemu lagi.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    </div>
+
+    <div class="divider"><span class="divider-inner">&#9670;</span></div>
+
+    <!-- TIPS -->
+    <section class="sec">
+        <div class="sec-head">
+            <div class="sec-tag">Tips Belajar</div>
+            <h2 class="sec-title">Kiat Cepat <span>Menguasai</span></h2>
+            <div class="sec-line"></div>
+            <p class="sec-desc">Strategi efektif untuk mempelajari Krama Inggil dengan lebih cepat</p>
+        </div>
+        <div class="tips-grid">
+            <div class="tip-card rv">
+                <div class="tip-num">01</div>
+                <div class="tip-lbl">Metode Belajar</div>
+                <h3 class="tip-title">Mulai dari Kosakata Dasar</h3>
+                <p class="tip-text">Fokus pada 50 kata paling sering digunakan. Hafalkan padanan Ngoko ke Krama Inggil untuk kata-kata sehari-hari seperti makan, minum, tidur, dan pergi.</p>
+            </div>
+            <div class="tip-card rv d1">
+                <div class="tip-num">02</div>
+                <div class="tip-lbl">Latihan Konsisten</div>
+                <h3 class="tip-title">Praktik Setiap Hari</h3>
+                <p class="tip-text">Luangkan 15-20 menit setiap hari untuk berlatih. Konsistensi lebih penting dari intensitas. Buat jadwal belajar rutin dan patuhi jadwal tersebut.</p>
+            </div>
+            <div class="tip-card rv d2">
+                <div class="tip-num">03</div>
+                <div class="tip-lbl">Immersion</div>
+                <h3 class="tip-title">Dengarkan Penutur Asli</h3>
+                <p class="tip-text">Tonton film atau podcast berbahasa Jawa. Mendengarkan percakapan asli membantu telinga Anda terbiasa dengan intonasi dan ritme bahasa yang benar.</p>
+            </div>
+            <div class="tip-card rv d3">
+                <div class="tip-num">04</div>
+                <div class="tip-lbl">Konteks Budaya</div>
+                <h3 class="tip-title">Pahami Konteks Sosial</h3>
+                <p class="tip-text">Bahasa Jawa sangat terkait dengan budaya dan hierarki sosial. Memahami konteks budaya akan membantu menggunakan bahasa yang tepat dalam situasi yang benar.</p>
+            </div>
+            <div class="tip-card rv d4">
+                <div class="tip-num">05</div>
+                <div class="tip-lbl">Praktik Nyata</div>
+                <h3 class="tip-title">Cari Teman Bicara</h3>
+                <p class="tip-text">Temukan teman atau komunitas penutur Bahasa Jawa. Praktik langsung dengan penutur asli adalah cara terbaik meningkatkan kemampuan berbicara.</p>
+            </div>
+            <div class="tip-card rv d5">
+                <div class="tip-num">06</div>
+                <div class="tip-lbl">Evaluasi Diri</div>
+                <h3 class="tip-title">Uji Kemampuan Rutin</h3>
+                <p class="tip-text">Lakukan kuis dan latihan secara teratur untuk mengukur perkembangan. Identifikasi area yang masih lemah dan fokuskan latihan pada area tersebut.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"><span class="divider-inner">&#9670;</span></div>
+
+    <!-- KUIS -->
+    <div class="bg-alt">
+    <section class="sec" id="kuis">
+        <div class="sec-head">
+            <div class="sec-tag">Uji Pengetahuan</div>
+            <h2 class="sec-title">Kuis <span>Interaktif</span></h2>
+            <div class="sec-line"></div>
+            <p class="sec-desc">Uji kemampuan Bahasa Jawa Krama Inggil Anda dengan kuis yang menarik</p>
+        </div>
+        <div class="quiz-wrap">
+            <div class="quiz-box" id="quizBox"></div>
+        </div>
+    </section>
+    </div>
+
+    <div class="divider"><span class="divider-inner">&#9670;</span></div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <h3>Sinau Basa Jawa</h3>
+                <p>Platform pembelajaran Bahasa Jawa Krama Inggil yang interaktif untuk melestarikan budaya Jawa.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Materi Belajar</h4>
+                <ul>
+                    <li><a href="#kosakata">Kosakata Dasar</a></li>
+                    <li><a href="#tatakrama">Tata Krama</a></li>
+                    <li><a href="#aksara">Aksara Jawa</a></li>
+                    <li><a href="#dialog">Dialog Percakapan</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Latihan</h4>
+                <ul>
+                    <li><a href="#kuis">Kuis Interaktif</a></li>
+                    <li><a href="#level">Tingkat Kemampuan</a></li>
+                    <li><a href="#dialog">Praktik Dialog</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Tentang</h4>
+                <ul>
+                    <li><a href="#">Tentang Platform</a></li>
+                    <li><a href="#">Sumber Referensi</a></li>
+                    <li><a href="#">Kebijakan Privasi</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Sinau Basa Jawa - Melestarikan Warisan Budaya Leluhur</p>
+            <div class="footer-orn">* * *</div>
+            <p>Dibuat dengan rasa cinta untuk budaya Jawa</p>
+        </div>
+    </footer>
+
+</div><!-- end wrapper -->
+
+<script>
+/* ===== LOADING ===== */
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        const ls = document.getElementById('loadingScreen');
+        ls.classList.add('gone');
+        setTimeout(() => { ls.style.display = 'none'; }, 700);
+    }, 1800);
+});
+
+/* ===== CANVAS 3D BACKGROUND ===== */
+(function() {
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, stars = [], particles = [];
+
+    function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Stars
+    for (let i = 0; i < 180; i++) {
+        stars.push({
+            x: Math.random() * 2000 - 1000,
+            y: Math.random() * 2000 - 1000,
+            z: Math.random() * 1200 + 200,
+            spd: Math.random() * 0.5 + 0.15,
+        });
+    }
+
+    // Floating dots
+    for (let i = 0; i < 35; i++) {
+        particles.push({
+            x: Math.random() * 1920,
+            y: Math.random() * 1080,
+            r: Math.random() * 2.5 + 0.5,
+            vx: (Math.random() - 0.5) * 0.35,
+            vy: (Math.random() - 0.5) * 0.35,
+            a: Math.random() * 0.3 + 0.05,
+        });
+    }
+
+    let frame = 0;
+
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+        frame++;
+
+        // Soft bg gradient
+        const grd = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W,H) * 0.8);
+        grd.addColorStop(0, 'rgba(40,18,0,0.25)');
+        grd.addColorStop(1, 'rgba(0,0,0,0.18)');
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, W, H);
+
+        const cx = W / 2, cy = H / 2;
+
+        // 3D stars
+        stars.forEach(s => {
+            s.z -= s.spd;
+            if (s.z <= 1) {
+                s.x = Math.random() * 2000 - 1000;
+                s.y = Math.random() * 2000 - 1000;
+                s.z = 1200;
+            }
+            const sc = 800 / s.z;
+            const sx = s.x * sc + cx;
+            const sy = s.y * sc + cy;
+            const sr = Math.max(0.3, sc * 0.8);
+            const alpha = Math.min(0.8, (1200 - s.z) / 900);
+            if (sx < -5 || sx > W + 5 || sy < -5 || sy > H + 5) return;
+            ctx.beginPath();
+            ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(240,208,128,${alpha * 0.65})`;
+            ctx.fill();
+        });
+
+        // Floating particles
+        particles.forEach(p => {
+            p.x += p.vx; p.y += p.vy;
+            if (p.x < 0) p.x = W;
+            if (p.x > W) p.x = 0;
+            if (p.y < 0) p.y = H;
+            if (p.y > H) p.y = 0;
+            ctx.beginPath();
+            ctx.arc(p.x % W, p.y % H, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(201,168,76,${p.a})`;
+            ctx.fill();
+        });
+
+        // Pulsing center glow
+        const pa = (Math.sin(frame * 0.018) + 1) * 0.025;
+        const pg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 350);
+        pg.addColorStop(0, `rgba(201,168,76,${pa})`);
+        pg.addColorStop(1, 'transparent');
+        ctx.fillStyle = pg;
+        ctx.fillRect(0, 0, W, H);
+
+        requestAnimationFrame(draw);
+    }
+    draw();
+})();
+
+/* ===== VOCAB DATA ===== */
+const vocabs = [
+    { jawa:'Dhahar', indo:'Makan', ngoko:'mangan', cat:'Kegiatan Sehari-hari' },
+    { jawa:'Ngunjuk', indo:'Minum', ngoko:'ngombe', cat:'Kegiatan Sehari-hari' },
+    { jawa:'Sare', indo:'Tidur', ngoko:'turu', cat:'Kegiatan Sehari-hari' },
+    { jawa:'Tindak', indo:'Pergi (untuk yang dihormati)', ngoko:'lunga', cat:'Gerakan' },
+    { jawa:'Rawuh', indo:'Datang', ngoko:'teka', cat:'Gerakan' },
+    { jawa:'Lenggah', indo:'Duduk', ngoko:'lungguh', cat:'Gerakan' },
+    { jawa:'Ngendika', indo:'Berkata / Berbicara', ngoko:'ngomong', cat:'Komunikasi' },
+    { jawa:'Mirengaken', indo:'Mendengarkan', ngoko:'ngrungokake', cat:'Komunikasi' },
+    { jawa:'Mangertos', indo:'Mengerti / Paham', ngoko:'ngerti', cat:'Pikiran' },
+    { jawa:'Badhe', indo:'Akan / Mau', ngoko:'arep', cat:'Kata Bantu' },
+    { jawa:'Sampun', indo:'Sudah / Selesai', ngoko:'wis', cat:'Kata Bantu' },
+    { jawa:'Dereng', indo:'Belum', ngoko:'durung', cat:'Kata Bantu' },
+    { jawa:'Wonten', indo:'Ada / Di', ngoko:'ana', cat:'Keberadaan' },
+    { jawa:'Boten', indo:'Tidak', ngoko:'ora', cat:'Negasi' },
+    { jawa:'Inggih', indo:'Iya / Ya', ngoko:'iya', cat:'Persetujuan' },
+    { jawa:'Kula', indo:'Saya (untuk diri sendiri)', ngoko:'aku', cat:'Kata Ganti' },
+    { jawa:'Panjenengan', indo:'Anda (untuk yang dihormati)', ngoko:'kowe', cat:'Kata Ganti' },
+    { jawa:'Sugeng', indo:'Selamat / Sehat', ngoko:'slamet', cat:'Ungkapan' },
+    { jawa:'Matur Nuwun', indo:'Terima Kasih', ngoko:'matur suwun', cat:'Ungkapan' },
+    { jawa:'Nyuwun Pangapunten', indo:'Minta Maaf', ngoko:'njaluk ngapura', cat:'Ungkapan' },
+    { jawa:'Griya', indo:'Rumah', ngoko:'omah', cat:'Tempat' },
+    { jawa:'Sowan', indo:'Berkunjung / Mengunjungi', ngoko:'mertamu', cat:'Kegiatan' },
+    { jawa:'Pamit', indo:'Pamit / Berpamitan', ngoko:'pamit', cat:'Kegiatan' },
+    { jawa:'Pinaringan', indo:'Diberi / Dianugerahi', ngoko:'dikeki', cat:'Ungkapan Doa' },
+];
+
+function buildVocab() {
+    const g = document.getElementById('vocabGrid');
+    g.innerHTML = '';
+    vocabs.forEach((v, i) => {
+        const d = i % 3;
+        const el = document.createElement('div');
+        el.className = `vocab-card rv${d > 0 ? ' d'+d : ''}`;
+        el.innerHTML = `
+            <div class="vc-cat">${v.cat}</div>
+            <div class="vc-jawa">${v.jawa}</div>
+            <div class="vc-indo">${v.indo}</div>
+            <div class="vc-ngoko">Ngoko: <span>${v.ngoko}</span></div>
+            <button class="speak-btn" onclick="speak('${v.jawa}',event)">
+                <span class="play-tri"></span> Dengarkan
+            </button>
+            <div class="vc-num">${String(i+1).padStart(2,'0')}</div>
+        `;
+        g.appendChild(el);
+    });
+    initReveal();
+}
+
+/* ===== AKSARA DATA ===== */
+const aksaras = [
+    {ch:'HA',lt:'Ha',mn:'Ada/Hidup'},{ch:'NA',lt:'Na',mn:'Niscaya'},
+    {ch:'CA',lt:'Ca',mn:'Cahaya'},{ch:'RA',lt:'Ra',mn:'Rasa/Jiwa'},
+    {ch:'KA',lt:'Ka',mn:'Kuat'},{ch:'DA',lt:'Da',mn:'Dapat'},
+    {ch:'TA',lt:'Ta',mn:'Teguh'},{ch:'SA',lt:'Sa',mn:'Suci'},
+    {ch:'WA',lt:'Wa',mn:'Bijak'},{ch:'LA',lt:'La',mn:'Langgeng'},
+    {ch:'PA',lt:'Pa',mn:'Padang'},{ch:'DHA',lt:'Dha',mn:'Dhuwur'},
+    {ch:'JA',lt:'Ja',mn:'Jaya'},{ch:'YA',lt:'Ya',mn:'Yakin'},
+    {ch:'NYA',lt:'Nya',mn:'Nyaman'},{ch:'MA',lt:'Ma',mn:'Mulya'},
+    {ch:'GA',lt:'Ga',mn:'Gagah'},{ch:'BA',lt:'Ba',mn:'Baik'},
+    {ch:'THA',lt:'Tha',mn:'Tahan'},{ch:'NGA',lt:'Nga',mn:'Ngudi'},
+];
+
+function buildAksara() {
+    const g = document.getElementById('aksaraGrid');
+    g.innerHTML = '';
+    aksaras.forEach((a, i) => {
+        const d = i % 5;
+        const el = document.createElement('div');
+        el.className = `aksara-card rv${d > 0 ? ' d'+d : ''}`;
+        el.innerHTML = `
+            <span class="aksara-ch">${a.ch}</span>
+            <span class="aksara-lt">${a.lt}</span>
+            <span class="aksara-mn">${a.mn}</span>
+        `;
+        el.addEventListener('click', () => notify(`Aksara "${a.lt}" - Makna: ${a.mn}`, 'info'));
+        g.appendChild(el);
+    });
+    initReveal();
+}
+
+/* ===== QUIZ DATA ===== */
+const quizData = [
+    {
+        q:'Apa kata Krama Inggil untuk "mangan" (makan)?',
+        sub:'Pilih jawaban yang paling tepat',
+        opts:['Nedha','Dhahar','Maem','Pangan'],
+        ans:1,
+        exp:'"Dhahar" adalah Krama Inggil untuk makan. "Nedha" adalah Krama Madya.'
+    },
+    {
+        q:'Bagaimana cara mengucapkan "terima kasih" dalam Krama Inggil?',
+        sub:'Temukan ungkapan yang paling sopan',
+        opts:['Matur suwun','Matur nuwun','Nuwun sewu','Suwun'],
+        ans:1,
+        exp:'"Matur nuwun" adalah bentuk Krama Inggil. "Matur suwun" adalah bentuk kurang formal.'
+    },
+    {
+        q:'Kata ganti orang pertama dalam Krama Inggil adalah...',
+        sub:'Kata yang digunakan untuk menyebut diri sendiri',
+        opts:['Aku','Awakku','Kula','Kawula'],
+        ans:2,
+        exp:'"Kula" adalah kata ganti orang pertama dalam Krama Inggil. "Aku" adalah bentuk Ngoko.'
+    },
+    {
+        q:'Terjemahan Krama Inggil dari "Kowe arep lunga neng ngendi?"',
+        sub:'Perhatikan semua kata dalam kalimat',
+        opts:[
+            'Sampeyan badhe tindak pundi?',
+            'Panjenengan badhe tindak pundi?',
+            'Kowe badhe tindak ngendi?',
+            'Panjenengan arep lunga ngendi?'
+        ],
+        ans:1,
+        exp:'"Panjenengan badhe tindak pundi?" adalah terjemahan benar. Kowe->panjenengan, arep->badhe, lunga->tindak, ngendi->pundi.'
+    },
+    {
+        q:'Kata "sare" dalam Krama Inggil berarti...',
+        sub:'Cari padanan yang tepat dalam bahasa Indonesia',
+        opts:['Makan','Minum','Tidur','Duduk'],
+        ans:2,
+        exp:'"Sare" berarti tidur. Padanan Ngoko-nya adalah "turu".'
+    },
+    {
+        q:'Sapaan "Sugeng enjang" digunakan pada waktu...',
+        sub:'Identifikasi konteks penggunaan yang tepat',
+        opts:['Siang hari','Malam hari','Pagi hari','Sore hari'],
+        ans:2,
+        exp:'"Sugeng enjang" = selamat pagi. Siang: "Sugeng siyang", Sore: "Sugeng sonten", Malam: "Sugeng dalu".'
+    },
+    {
+        q:'Kata Krama Inggil untuk "omah" (rumah) adalah...',
+        sub:'Pilih kata yang paling halus',
+        opts:['Wisma','Griya','Pondok','Bale'],
+        ans:1,
+        exp:'"Griya" adalah Krama Inggil untuk "omah" (rumah).'
+    },
+    {
+        q:'Kata "rawuh" dalam Krama Inggil berarti...',
+        sub:'Temukan arti yang paling tepat',
+        opts:['Pergi','Datang','Duduk','Berdiri'],
+        ans:1,
+        exp:'"Rawuh" berarti datang. Padanan Ngoko-nya adalah "teka".'
+    },
+];
+
+let qIdx = 0, qScore = 0, qAnswered = false;
+
+function buildQuiz() {
+    const box = document.getElementById('quizBox');
+    if (!box) return;
+
+    if (qIdx >= quizData.length) {
+        renderResult(box);
+        return;
+    }
+
+    const q = quizData[qIdx];
+    const pct = (qIdx / quizData.length) * 100;
+
+    box.innerHTML = `
+        <div class="qprog">
+            <span class="qprog-txt">${qIdx+1}/${quizData.length}</span>
+            <div class="qprog-bar"><div class="qprog-fill" style="width:${pct}%"></div></div>
+            <span class="qscore">Skor: ${qScore}</span>
+        </div>
+        <div class="q-lbl">Pertanyaan</div>
+        <div class="q-text">${q.q}</div>
+        <div class="q-sub">${q.sub}</div>
+        <div class="q-opts">
+            ${q.opts.map((o,i) => `
+                <button class="q-opt" id="qo${i}" onclick="pickAns(${i})">
+                    <strong>${String.fromCharCode(65+i)}.</strong> ${o}
+                </button>
+            `).join('')}
+        </div>
+        <div class="q-fb" id="qfb"></div>
+        <button class="q-next" id="qnext" onclick="nextQ()" disabled>
+            ${qIdx+1 < quizData.length ? 'Soal Berikutnya' : 'Lihat Hasil'}
+        </button>
+    `;
+    qAnswered = false;
+}
+
+function pickAns(i) {
+    if (qAnswered) return;
+    qAnswered = true;
+    const q = quizData[qIdx];
+    const fb = document.getElementById('qfb');
+    const nxt = document.getElementById('qnext');
+
+    q.opts.forEach((_,j) => {
+        const b = document.getElementById('qo'+j);
+        if (b) {
+            b.disabled = true;
+            if (j === q.ans) b.classList.add('ok');
+            else if (j === i && i !== q.ans) b.classList.add('no');
+        }
+    });
+
+    if (i === q.ans) {
+        qScore++;
+        fb.className = 'q-fb ok show';
+        fb.innerHTML = '<strong>Benar!</strong> ' + q.exp;
+        notify('Jawaban benar!', 'success');
+    } else {
+        fb.className = 'q-fb no show';
+        fb.innerHTML = '<strong>Kurang tepat.</strong> ' + q.exp;
+        notify('Jawaban kurang tepat', 'error');
+    }
+    if (nxt) nxt.disabled = false;
+}
+
+function nextQ() {
+    qIdx++;
+    buildQuiz();
+}
+
+function renderResult(box) {
+    const pct = Math.round((qScore / quizData.length) * 100);
+    let grade, msg;
+    if (pct >= 90)      { grade = 'Sangat Mahir'; msg = 'Luar biasa! Kemampuan Krama Inggil Anda sangat baik. Terus pertahankan!'; }
+    else if (pct >= 70) { grade = 'Mahir'; msg = 'Bagus! Anda sudah memahami dasar-dasar Krama Inggil dengan baik.'; }
+    else if (pct >= 50) { grade = 'Menengah'; msg = 'Cukup baik! Masih ada beberapa hal yang perlu dipelajari lagi.'; }
+    else                { grade = 'Pemula'; msg = 'Jangan menyerah! Terus berlatih dan Anda pasti bisa berkembang.'; }
+
+    box.innerHTML = `
+        <div class="q-result">
+            <div class="qr-label">Hasil Kuis</div>
+            <div class="qr-grade">${grade}</div>
+            <div class="qr-pct">${pct}%</div>
+            <div class="qr-raw">${qScore} dari ${quizData.length} soal benar</div>
+            <div class="qr-msg">${msg}</div>
+            <button class="q-next" onclick="restartQ()">Ulangi Kuis</button>
+        </div>
+    `;
+    confetti();
+}
+
+function restartQ() {
+    qIdx = 0; qScore = 0; qAnswered = false;
+    buildQuiz();
+}
+
+function confetti() {
+    for (let i = 0; i < 25; i++) {
+        setTimeout(() => {
+            const p = document.createElement('div');
+            p.style.cssText = `
+                position:fixed;
+                left:${Math.random()*100}vw;
+                bottom:-10px;
+                width:${4+Math.random()*7}px;
+                height:${4+Math.random()*7}px;
+                background:${Math.random()>.5?'#c9a84c':'#f0d080'};
+                border-radius:50%;
+                pointer-events:none;
+                z-index:9998;
+                animation:confettiUp ${2+Math.random()*1.5}s ease forwards;
+            `;
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 3500);
+        }, i * 80);
+    }
+}
+
+/* ===== DIALOG TABS ===== */
+function showDlg(id, btn) {
+    document.querySelectorAll('.dlg-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.dlg-tab').forEach(b => b.classList.remove('active'));
+    const el = document.getElementById('dlg-' + id);
+    if (el) el.classList.add('active');
+    if (btn) btn.classList.add('active');
+}
+
+/* ===== LEVEL ===== */
+function pickLevel(el, name) {
+    document.querySelectorAll('.level-card').forEach(c => c.classList.remove('active-lv'));
+    el.classList.add('active-lv');
+    const msgs = {
+        pemula:'Tingkat Pemula dipilih! Mulai dari kosakata dasar.',
+        menengah:'Tingkat Menengah dipilih! Mari pelajari kalimat lengkap.',
+        mahir:'Tingkat Mahir dipilih! Eksplorasi budaya dan sastra Jawa.'
+    };
+    notify(msgs[name] || '', 'info');
+}
+
+/* ===== SPEAK ===== */
+function speak(word, e) {
+    e.stopPropagation();
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(word);
+        u.lang = 'id-ID'; u.rate = 0.8;
+        window.speechSynthesis.speak(u);
+        notify('Memainkan: "' + word + '"', 'info');
+    } else {
+        notify('Browser tidak mendukung Text-to-Speech', 'error');
+    }
+}
+
+/* ===== NOTIFICATION ===== */
+let notifTimer;
+function notify(msg, type) {
+    const n = document.getElementById('notif');
+    n.textContent = msg;
+    n.className = 'notif ' + type + ' show';
+    clearTimeout(notifTimer);
+    notifTimer = setTimeout(() => n.classList.remove('show'), 3000);
+}
+
+/* ===== SCROLL REVEAL ===== */
+function initReveal() {
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+}
+
+/* ===== COUNTER ===== */
+function initCounters() {
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (!e.isIntersecting) return;
+            const el = e.target;
+            const target = parseInt(el.getAttribute('data-target'));
+            let cur = 0;
+            const step = target / 55;
+            const timer = setInterval(() => {
+                cur = Math.min(cur + step, target);
+                el.textContent = Math.floor(cur) + (target >= 50 ? '+' : '');
+                if (cur >= target) clearInterval(timer);
+            }, 16);
+            obs.unobserve(el);
+        });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('[data-target]').forEach(el => obs.observe(el));
+}
+
+/* ===== NAVBAR SCROLL ===== */
+window.addEventListener('scroll', () => {
+    const nb = document.querySelector('.navbar');
+    nb.style.borderBottomColor = window.scrollY > 60
+        ? 'rgba(201,168,76,0.18)'
+        : 'rgba(201,168,76,0.08)';
+}, { passive: true });
+
+/* ===== EXTRA KEYFRAMES ===== */
+const sty = document.createElement('style');
+sty.textContent = `
+    @keyframes confettiUp {
+        0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(-90vh) rotate(540deg); opacity: 0; }
+    }
+`;
+document.head.appendChild(sty);
+
+/* ===== INIT ===== */
+buildVocab();
+buildAksara();
+buildQuiz();
+initReveal();
+initCounters();
+
+setTimeout(() => notify('Selamat datang di Sinau Basa Jawa!', 'success'), 2000);
+</script>
+</body>
+</html>
