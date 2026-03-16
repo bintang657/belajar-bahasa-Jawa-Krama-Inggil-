@@ -1,872 +1,450 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sinau Basa Jawa Krama Inggil</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        :root{
-            --gold:#c9a84c;--gold-l:#f0d080;--gold-d:#8b6914;
-            --bg:#0d0500;--bg2:#1a0a00;--bg3:#2d1500;
-            --cream:#f5e6c8;--cream2:#e8d4a0;
-        }
-        html{scroll-behavior:smooth}
-        body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--cream);overflow-x:hidden}
-        ::-webkit-scrollbar{width:5px}
-        ::-webkit-scrollbar-track{background:var(--bg)}
-        ::-webkit-scrollbar-thumb{background:var(--gold-d);border-radius:3px}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sinau Basa Jawa Krama Inggil</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--g:#c9a84c;--gl:#f0d080;--gd:#8b6914;--bg:#0d0500;--bg2:#1a0a00;--cr:#f5e6c8;--glass:rgba(29,14,0,0.45);--glass-b:rgba(201,168,76,0.12);--glass-h:rgba(201,168,76,0.22)}
+html{scroll-behavior:smooth}
+body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--cr);overflow-x:hidden}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--gd);border-radius:3px}
 
-        /* ===== ONBOARDING ===== */
-        .onboard-overlay{
-            position:fixed;inset:0;z-index:10000;
-            background:var(--bg);
-            display:flex;align-items:center;justify-content:center;
-            transition:opacity 0.8s ease;
-        }
-        .onboard-overlay.hidden{opacity:0;pointer-events:none}
-        .onboard-container{
-            width:100%;max-width:500px;padding:30px;text-align:center;
-            position:relative;
-        }
-        .onboard-steps{position:relative;overflow:hidden;min-height:450px}
-        .onboard-step{
-            position:absolute;inset:0;
-            display:flex;flex-direction:column;align-items:center;justify-content:center;
-            padding:20px;
-            opacity:0;transform:translateX(100px);
-            transition:all 0.5s cubic-bezier(.4,0,.2,1);
-            pointer-events:none;
-        }
-        .onboard-step.active{opacity:1;transform:translateX(0);pointer-events:all}
-        .onboard-step.left{opacity:0;transform:translateX(-100px)}
+/* CINEMATIC LOADER */
+.cine-loader{position:fixed;inset:0;z-index:99999;background:#050200;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s ease}
+.cine-loader.done{opacity:0;pointer-events:none}
+.cine-line{width:0;height:2px;background:linear-gradient(90deg,transparent,var(--g),transparent);transition:width 0.6s ease;margin-bottom:30px}
+.cine-line.expand{width:200px}
+.cine-aksara{display:flex;gap:12px;margin-bottom:24px;height:40px;align-items:center}
+.cine-char{font-size:1.6rem;color:var(--g);opacity:0;transform:translateY(20px);transition:all 0.3s ease;font-weight:bold}
+.cine-char.show{opacity:1;transform:translateY(0)}
+.cine-char.burst{animation:charBurst 0.5s ease forwards}
+@keyframes charBurst{to{opacity:0;transform:scale(2) translateY(-20px)}}
+.cine-logo{font-size:clamp(1.5rem,4vw,2.5rem);opacity:0;transform:scale(0.8);transition:all 0.6s cubic-bezier(.175,.885,.32,1.275);background:linear-gradient(135deg,var(--gl),var(--g),var(--gd));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:3px}
+.cine-logo.show{opacity:1;transform:scale(1)}
+.cine-sub{opacity:0;transition:opacity 0.5s ease;font-size:0.7rem;letter-spacing:4px;color:rgba(201,168,76,0.5);text-transform:uppercase;margin-top:10px}
+.cine-sub.show{opacity:1}
+.cine-particles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 
-        .ob-splash-title{
-            font-size:clamp(2rem,6vw,3.5rem);
-            background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));
-            -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-            margin-bottom:12px;line-height:1.2;
-        }
-        .ob-splash-sub{color:rgba(245,230,200,0.5);font-size:0.9rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:30px}
-        .ob-splash-line{
-            width:120px;height:2px;margin:0 auto 30px;
-            background:linear-gradient(90deg,transparent,var(--gold),transparent);
-        }
-        .ob-particles{
-            position:absolute;inset:0;pointer-events:none;overflow:hidden;
-        }
-        .ob-particle{
-            position:absolute;border-radius:50%;
-            background:var(--gold);opacity:0;
-            animation:obFloat 3s ease-in-out infinite;
-        }
-        @keyframes obFloat{
-            0%{opacity:0;transform:translateY(20px) scale(0)}
-            50%{opacity:0.6;transform:translateY(-30px) scale(1)}
-            100%{opacity:0;transform:translateY(-60px) scale(0)}
-        }
+/* CURSOR */
+.cursor-ring{position:fixed;width:36px;height:36px;border:1.5px solid rgba(201,168,76,0.5);border-radius:50%;pointer-events:none;z-index:99998;transition:width 0.2s,height 0.2s,border-color 0.2s;transform:translate(-50%,-50%);mix-blend-mode:difference}
+.cursor-dot{position:fixed;width:5px;height:5px;background:var(--g);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%)}
+.cursor-ring.hover{width:52px;height:52px;border-color:var(--g)}
+.cursor-trail{position:fixed;width:3px;height:3px;background:rgba(201,168,76,0.3);border-radius:50%;pointer-events:none;z-index:99997}
+@media(max-width:768px){.cursor-ring,.cursor-dot,.cursor-trail{display:none}body{cursor:auto}}
+@media(min-width:769px){body{cursor:none}}
 
-        .ob-ring{
-            position:absolute;border-radius:50%;
-            border:1px solid rgba(201,168,76,0.12);
-            animation:obSpin 20s linear infinite;
-        }
-        @keyframes obSpin{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+/* CANVAS */
+#bgCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 
-        /* Avatar Selection */
-        .avatar-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:20px 0}
-        .avatar-option{
-            padding:20px 16px;
-            background:rgba(29,14,0,0.8);border:2px solid rgba(201,168,76,0.15);
-            border-radius:18px;cursor:pointer;transition:all 0.35s;text-align:center;
-        }
-        .avatar-option:hover{border-color:rgba(201,168,76,0.4);transform:translateY(-4px)}
-        .avatar-option.selected{border-color:var(--gold);box-shadow:0 0 30px rgba(201,168,76,0.2);background:rgba(201,168,76,0.06)}
-        .av-char{
-            width:70px;height:70px;border-radius:50%;margin:0 auto 12px;
-            display:flex;align-items:center;justify-content:center;
-            font-size:2rem;font-weight:bold;
-        }
-        .av-char-1{background:linear-gradient(135deg,#8b6914,#3d1f00);color:var(--gold-l)}
-        .av-char-2{background:linear-gradient(135deg,#3d1a5c,#1a0a30);color:#c0a0e0}
-        .av-char-3{background:linear-gradient(135deg,#1a4a1a,#0a200a);color:#90d890}
-        .av-char-4{background:linear-gradient(135deg,#5c1a1a,#300a0a);color:#e09090}
-        .av-name{font-size:0.95rem;color:var(--cream);margin-bottom:4px}
-        .av-role{font-size:0.7rem;color:rgba(201,168,76,0.6);letter-spacing:1px}
+/* WRAPPER */
+.wrapper{position:relative;z-index:1}
 
-        /* Placement Test */
-        .ob-quiz-q{font-size:1.15rem;color:var(--cream);margin-bottom:20px;line-height:1.5}
-        .ob-quiz-opts{display:grid;gap:10px;width:100%;max-width:380px}
-        .ob-quiz-opt{
-            padding:13px 18px;background:rgba(201,168,76,0.03);
-            border:1px solid rgba(201,168,76,0.14);border-radius:12px;
-            font-size:0.9rem;color:var(--cream);cursor:pointer;
-            transition:all 0.25s;text-align:left;font-family:Georgia,serif;
-        }
-        .ob-quiz-opt:hover{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.08)}
-        .ob-quiz-opt.correct{background:rgba(26,74,26,0.35);border-color:#4a9a4a;color:#90d890}
-        .ob-quiz-opt.wrong{background:rgba(139,26,26,0.35);border-color:#9a4a4a;color:#d89090}
-        .ob-quiz-counter{font-size:0.72rem;color:var(--gold);letter-spacing:2px;margin-bottom:16px;text-transform:uppercase}
+/* GLASSMORPHISM */
+.glass{background:var(--glass);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border:1px solid var(--glass-b);transition:all 0.4s cubic-bezier(.175,.885,.32,1.275)}
+.glass:hover{border-color:var(--glass-h);box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 30px rgba(201,168,76,0.06)}
+.glass::before{content:'';position:absolute;inset:0;border-radius:inherit;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;opacity:0.5}
 
-        /* Goal Selection */
-        .goal-grid{display:grid;gap:12px;width:100%;max-width:340px;margin:20px auto}
-        .goal-option{
-            padding:16px;background:rgba(29,14,0,0.8);border:2px solid rgba(201,168,76,0.12);
-            border-radius:14px;cursor:pointer;transition:all 0.3s;
-            display:flex;align-items:center;gap:14px;
-        }
-        .goal-option:hover{border-color:rgba(201,168,76,0.4)}
-        .goal-option.selected{border-color:var(--gold);background:rgba(201,168,76,0.06)}
-        .goal-mins{
-            width:50px;height:50px;border-radius:12px;
-            background:linear-gradient(135deg,var(--gold-d),var(--bg3));
-            display:flex;align-items:center;justify-content:center;flex-shrink:0;
-            font-size:1.2rem;font-weight:bold;color:var(--gold-l);
-        }
-        .goal-text{text-align:left}
-        .goal-text-main{font-size:0.95rem;color:var(--cream);margin-bottom:2px}
-        .goal-text-sub{font-size:0.72rem;color:rgba(245,230,200,0.45)}
+/* SKELETON */
+.skeleton{position:relative;overflow:hidden;background:rgba(29,14,0,0.6);border-radius:inherit}
+.skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.04),transparent);animation:shimmer 1.8s infinite;transform:translateX(-100%)}
+@keyframes shimmer{to{transform:translateX(100%)}}
+.skel-line{height:14px;border-radius:7px;margin-bottom:10px}
+.skel-line.w60{width:60%}.skel-line.w80{width:80%}.skel-line.w40{width:40%}.skel-line.w100{width:100%}
+.skel-circle{border-radius:50%}
+.skel-card{border-radius:18px;padding:26px;border:1px solid rgba(201,168,76,0.06)}
+.skel-title{height:28px;width:50%;border-radius:8px;margin:0 auto 20px}
+.skel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.skel-item{height:200px;border-radius:18px}
 
-        /* Progress Dots */
-        .ob-dots{display:flex;gap:8px;justify-content:center;margin-top:30px}
-        .ob-dot{
-            width:8px;height:8px;border-radius:50%;
-            background:rgba(201,168,76,0.2);transition:all 0.3s;
-        }
-        .ob-dot.active{background:var(--gold);width:24px;border-radius:4px}
-        .ob-dot.done{background:rgba(201,168,76,0.5)}
+/* PARALLAX */
+.parallax-section{position:relative;overflow:hidden}
+.parallax-bg{position:absolute;inset:-60px;background-size:cover;background-position:center;will-change:transform;pointer-events:none;opacity:0.12}
+.parallax-fg{position:relative;z-index:2}
 
-        /* Onboard buttons */
-        .ob-btn{
-            padding:14px 40px;background:linear-gradient(135deg,var(--gold),var(--gold-d));
-            color:var(--bg);border:none;border-radius:50px;font-size:0.95rem;
-            font-weight:bold;cursor:pointer;font-family:Georgia,serif;
-            transition:all 0.3s;margin-top:16px;
-        }
-        .ob-btn:hover{transform:translateY(-3px);box-shadow:0 12px 35px rgba(201,168,76,0.4)}
-        .ob-btn-ghost{
-            padding:12px 30px;background:transparent;
-            color:var(--gold);border:1px solid rgba(201,168,76,0.3);
-            border-radius:50px;font-size:0.85rem;cursor:pointer;
-            font-family:Georgia,serif;transition:all 0.3s;margin-top:10px;
-        }
-        .ob-btn-ghost:hover{background:rgba(201,168,76,0.06)}
+/* NAVBAR */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;background:rgba(13,5,0,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(201,168,76,0.08);transition:all 0.3s}
+.navbar.scrolled{background:rgba(13,5,0,0.96);border-bottom-color:rgba(201,168,76,0.18)}
+.nav-logo{font-size:1rem;font-weight:bold;color:var(--g);letter-spacing:2px}
+.nav-menu{display:flex;gap:4px;flex-wrap:wrap}
+.nav-menu a{color:rgba(245,230,200,0.55);text-decoration:none;font-size:0.68rem;padding:6px 10px;border-radius:8px;transition:all 0.3s;border:1px solid transparent;position:relative;overflow:hidden}
+.nav-menu a:hover{color:var(--g);border-color:rgba(201,168,76,0.2);background:rgba(201,168,76,0.04)}
+.nav-user{display:flex;align-items:center;gap:8px}
+.nav-streak{display:flex;align-items:center;gap:4px;padding:4px 12px;border-radius:50px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);font-size:0.72rem;color:var(--g)}
+.streak-fire{color:#ff6b35;font-weight:bold;font-size:0.85rem}
+.nav-xp{padding:4px 12px;border-radius:50px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);font-size:0.72rem;color:var(--gl)}
+.nav-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:bold;border:2px solid rgba(201,168,76,0.3);cursor:pointer;transition:all 0.3s}
+.nav-av:hover{border-color:var(--g);transform:scale(1.1)}
+@media(max-width:768px){.nav-menu{display:none}}
 
-        .ob-title{font-size:1.5rem;color:var(--gold-l);margin-bottom:8px}
-        .ob-desc{font-size:0.88rem;color:rgba(245,230,200,0.55);line-height:1.7;margin-bottom:18px;max-width:380px}
-        .ob-tag{
-            display:inline-block;padding:4px 14px;
-            background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);
-            border-radius:50px;font-size:0.65rem;letter-spacing:2.5px;
-            color:var(--gold);text-transform:uppercase;margin-bottom:16px;
-        }
+/* SHARED */
+.sec{padding:80px 20px;max-width:1100px;margin:0 auto;position:relative}
+.sec-head{text-align:center;margin-bottom:50px}
+.sec-tag{display:inline-block;padding:5px 18px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:50px;font-size:0.65rem;letter-spacing:3px;color:var(--g);text-transform:uppercase;margin-bottom:14px}
+.sec-title{font-size:clamp(1.6rem,4vw,2.8rem);color:var(--cr);margin-bottom:14px}
+.sec-title span{background:linear-gradient(135deg,var(--gl),var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sec-line{width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--g),transparent);margin:14px auto}
+.sec-desc{color:rgba(245,230,200,0.55);font-size:0.92rem;line-height:1.8;max-width:520px;margin:0 auto}
+.divider{text-align:center;padding:10px 0}.divider::before,.divider::after{content:'';display:inline-block;width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--g));vertical-align:middle;margin:0 12px}.divider::after{background:linear-gradient(90deg,var(--g),transparent)}
+.bg-alt{background:rgba(29,14,0,0.2)}
 
-        .ob-result-level{
-            font-size:2rem;font-weight:900;
-            background:linear-gradient(135deg,var(--gold-l),var(--gold));
-            -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-            margin:12px 0;
-        }
+/* BUTTONS */
+.btn-gold{padding:14px 36px;background:linear-gradient(135deg,var(--g),var(--gd));color:var(--bg);border:none;border-radius:50px;font-size:0.92rem;font-weight:bold;cursor:pointer;text-decoration:none;transition:all 0.3s;font-family:Georgia,serif;display:inline-block;position:relative;overflow:hidden}
+.btn-gold::after{content:'';position:absolute;top:50%;left:50%;width:0;height:0;background:rgba(255,255,255,0.2);border-radius:50%;transform:translate(-50%,-50%);transition:width 0.5s,height 0.5s}
+.btn-gold:hover{transform:translateY(-3px);box-shadow:0 14px 40px rgba(201,168,76,0.35)}
+.btn-gold:active::after{width:300px;height:300px}
+.btn-outline{padding:14px 36px;background:transparent;color:var(--g);border:2px solid rgba(201,168,76,0.4);border-radius:50px;font-size:0.92rem;cursor:pointer;text-decoration:none;transition:all 0.3s;font-family:Georgia,serif;display:inline-block}
+.btn-outline:hover{background:rgba(201,168,76,0.06);transform:translateY(-3px);border-color:var(--g)}
 
-        /* ===== CANVAS BG ===== */
-        #bgCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+/* REVEAL */
+.rv{opacity:0;transform:translateY(40px);transition:opacity 0.8s ease,transform 0.8s ease}
+.rv.show{opacity:1;transform:translateY(0)}
+.rv.d1{transition-delay:.1s}.rv.d2{transition-delay:.2s}.rv.d3{transition-delay:.3s}.rv.d4{transition-delay:.4s}
 
-        /* ===== MAIN WRAPPER ===== */
-        .wrapper{position:relative;z-index:1}
+/* NOTIFICATION */
+.notif{position:fixed;top:70px;right:20px;padding:14px 22px;border-radius:14px;font-size:0.84rem;z-index:9999;transform:translateX(120%);transition:transform 0.4s cubic-bezier(.175,.885,.32,1.275);max-width:280px;line-height:1.5;backdrop-filter:blur(12px)}
+.notif.show{transform:translateX(0)}
+.notif.success{background:rgba(20,60,20,0.92);border:1px solid rgba(74,154,74,0.4);color:#90d890}
+.notif.info{background:rgba(20,20,80,0.92);border:1px solid rgba(74,74,180,0.4);color:#a0a0e8}
+.notif.error{background:rgba(100,20,20,0.92);border:1px solid rgba(154,74,74,0.4);color:#d89090}
 
-        /* ===== NAVBAR ===== */
-        .navbar{
-            position:fixed;top:0;left:0;right:0;z-index:100;
-            padding:12px 20px;display:flex;justify-content:space-between;align-items:center;
-            background:rgba(13,5,0,0.95);backdrop-filter:blur(12px);
-            border-bottom:1px solid rgba(201,168,76,0.1);
-        }
-        .nav-logo{font-size:1rem;font-weight:bold;color:var(--gold);letter-spacing:2px}
-        .nav-user{display:flex;align-items:center;gap:10px}
-        .nav-streak{
-            display:flex;align-items:center;gap:5px;
-            padding:5px 12px;border-radius:50px;
-            background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);
-            font-size:0.75rem;color:var(--gold);
-        }
-        .streak-fire{color:#ff6b35;font-weight:bold;font-size:0.9rem}
-        .nav-xp{
-            padding:5px 12px;border-radius:50px;
-            background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);
-            font-size:0.75rem;color:var(--gold-l);
-        }
-        .nav-av{
-            width:34px;height:34px;border-radius:50%;
-            display:flex;align-items:center;justify-content:center;
-            font-size:0.85rem;font-weight:bold;
-            border:2px solid rgba(201,168,76,0.3);cursor:pointer;
-        }
-        .nav-menu{display:flex;gap:4px;flex-wrap:wrap}
-        .nav-menu a{
-            color:rgba(245,230,200,0.6);text-decoration:none;font-size:0.68rem;
-            padding:5px 8px;border-radius:6px;transition:all 0.3s;border:1px solid transparent;
-        }
-        .nav-menu a:hover{color:var(--gold);border-color:rgba(201,168,76,0.3)}
-        @media(max-width:800px){.nav-menu{display:none}}
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 24px 80px;position:relative}
+.hero-ring{position:absolute;border-radius:50%;border:1px solid rgba(201,168,76,0.08);top:50%;left:50%;transform:translate(-50%,-50%);animation:spinR 30s linear infinite}
+.hero-ring:nth-child(1){width:500px;height:500px}.hero-ring:nth-child(2){width:350px;height:350px;animation-direction:reverse;animation-duration:20s}.hero-ring:nth-child(3){width:650px;height:650px;animation-duration:40s;opacity:0.4}
+@keyframes spinR{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+.hero-badge{display:inline-block;padding:7px 22px;border:1px solid rgba(201,168,76,0.35);border-radius:50px;font-size:0.7rem;letter-spacing:3px;color:var(--g);text-transform:uppercase;margin-bottom:22px;position:relative;overflow:hidden;animation:fadeUp .8s ease both}
+.hero-badge::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.2),transparent);animation:sweep 2.5s infinite}
+@keyframes sweep{0%{left:-100%}100%{left:100%}}
+.hero-title{font-size:clamp(2.2rem,8vw,5rem);line-height:1.15;margin-bottom:18px}
+.hero-title .t1{display:block;color:var(--cr);animation:fadeUp .8s ease .2s both}
+.hero-title .t2{display:block;background:linear-gradient(135deg,var(--gl),var(--g),var(--gd));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:fadeUp .8s ease .4s both}
+.hero-title .t3{display:block;font-size:.42em;letter-spacing:6px;color:rgba(245,230,200,0.5);text-transform:uppercase;animation:fadeUp .8s ease .6s both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.hero-sub{max-width:540px;font-size:0.95rem;line-height:1.8;color:rgba(245,230,200,0.6);margin-bottom:36px;animation:fadeUp .8s ease .8s both}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;animation:fadeUp .8s ease 1s both}
 
-        /* ===== SHARED STYLES ===== */
-        .sec{padding:60px 20px;max-width:1100px;margin:0 auto}
-        .sec-head{text-align:center;margin-bottom:44px}
-        .sec-tag{display:inline-block;padding:5px 18px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:50px;font-size:0.68rem;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:12px}
-        .sec-title{font-size:clamp(1.6rem,4vw,2.6rem);color:var(--cream);margin-bottom:12px}
-        .sec-title span{background:linear-gradient(135deg,var(--gold-l),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-        .sec-line{width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:12px auto}
-        .sec-desc{color:rgba(245,230,200,0.58);font-size:0.95rem;line-height:1.75;max-width:540px;margin:0 auto}
-        .divider{text-align:center;padding:10px 0}
-        .divider::before,.divider::after{content:'';display:inline-block;width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold));vertical-align:middle;margin:0 12px}
-        .divider::after{background:linear-gradient(90deg,var(--gold),transparent)}
-        .di{color:var(--gold);font-size:0.9rem;vertical-align:middle}
-        .bg-alt{background:rgba(29,14,0,0.25)}
-        .btn-gold{padding:14px 36px;background:linear-gradient(135deg,var(--gold),var(--gold-d));color:var(--bg);border:none;border-radius:50px;font-size:0.95rem;font-weight:bold;cursor:pointer;text-decoration:none;transition:all 0.3s;font-family:Georgia,serif;display:inline-block}
-        .btn-gold:hover{transform:translateY(-3px);box-shadow:0 12px 35px rgba(201,168,76,0.4)}
-        .btn-outline{padding:14px 36px;background:transparent;color:var(--gold);border:2px solid var(--gold);border-radius:50px;font-size:0.95rem;cursor:pointer;text-decoration:none;transition:all 0.3s;font-family:Georgia,serif;display:inline-block}
-        .btn-outline:hover{background:rgba(201,168,76,0.1);transform:translateY(-3px)}
-        .rv{opacity:0;transform:translateY(32px);transition:opacity 0.7s ease,transform 0.7s ease}
-        .rv.show{opacity:1;transform:translateY(0)}
-        .rv.d1{transition-delay:.1s}.rv.d2{transition-delay:.2s}.rv.d3{transition-delay:.3s}.rv.d4{transition-delay:.4s}.rv.d5{transition-delay:.5s}
-        .notif{position:fixed;top:70px;right:20px;padding:13px 22px;border-radius:10px;font-size:0.86rem;z-index:9999;transform:translateX(110%);transition:transform 0.4s cubic-bezier(.175,.885,.32,1.275);max-width:280px;line-height:1.5}
-        .notif.show{transform:translateX(0)}
-        .notif.success{background:rgba(20,60,20,0.95);border:1px solid rgba(74,154,74,0.45);color:#90d890}
-        .notif.error{background:rgba(100,20,20,0.95);border:1px solid rgba(154,74,74,0.45);color:#d89090}
-        .notif.info{background:rgba(20,20,80,0.95);border:1px solid rgba(74,74,180,0.45);color:#a0a0e8}
+/* WOTD */
+.wotd-card{position:absolute;bottom:100px;left:50%;transform:translateX(-50%);padding:16px 28px;border-radius:18px;text-align:center;animation:fadeUp 1s ease 1.4s both;z-index:3;min-width:240px}
+.wotd-label{font-size:0.6rem;letter-spacing:3px;color:var(--g);text-transform:uppercase;margin-bottom:6px}
+.wotd-word{font-size:1.6rem;font-weight:bold;color:var(--gl);margin-bottom:4px}
+.wotd-meaning{font-size:0.82rem;color:rgba(245,230,200,0.55)}
 
-        /* ===== HERO ===== */
-        .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 24px 80px;position:relative}
-        .hero-ring{position:absolute;border-radius:50%;border:1px solid rgba(201,168,76,0.1);top:50%;left:50%;transform:translate(-50%,-50%);animation:spinR 30s linear infinite}
-        .hero-ring:nth-child(1){width:500px;height:500px}
-        .hero-ring:nth-child(2){width:350px;height:350px;animation-direction:reverse;animation-duration:20s}
-        .hero-ring:nth-child(3){width:650px;height:650px;animation-duration:40s;opacity:0.5}
-        @keyframes spinR{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
-        .hero-badge{display:inline-block;padding:7px 22px;border:1px solid rgba(201,168,76,0.4);border-radius:50px;font-size:0.72rem;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:22px;position:relative;overflow:hidden;animation:fadeUp 0.8s ease forwards}
-        .hero-badge::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.25),transparent);animation:sweep 2.5s infinite}
-        @keyframes sweep{0%{left:-100%}100%{left:100%}}
-        .hero-title{font-size:clamp(2.2rem,8vw,5rem);line-height:1.15;margin-bottom:18px}
-        .hero-title .t1{display:block;color:var(--cream);animation:fadeUp .8s ease .2s both}
-        .hero-title .t2{display:block;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:fadeUp .8s ease .4s both}
-        .hero-title .t3{display:block;font-size:.42em;letter-spacing:6px;color:rgba(245,230,200,0.55);text-transform:uppercase;animation:fadeUp .8s ease .6s both}
-        @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-        .hero-sub{max-width:560px;font-size:1rem;line-height:1.8;color:rgba(245,230,200,0.65);margin-bottom:36px;animation:fadeUp .8s ease .8s both}
-        .hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;animation:fadeUp .8s ease 1s both}
+/* 3D TUTOR */
+.tutor-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+@media(max-width:768px){.tutor-grid{grid-template-columns:1fr;text-align:center}}
+.tutor-stage{position:relative;width:100%;max-width:350px;aspect-ratio:3/4;margin:0 auto;perspective:1000px}
+.tutor-char{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform-style:preserve-3d;animation:tutFloat 4s ease-in-out infinite}
+@keyframes tutFloat{0%,100%{transform:translateY(0) rotateY(0)}25%{transform:translateY(-10px) rotateY(2deg)}50%{transform:translateY(-18px) rotateY(0)}75%{transform:translateY(-10px) rotateY(-2deg)}}
+.tut-body{position:relative;width:180px;height:280px}
+.tut-head{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#f0d080,#c9a84c);position:absolute;top:0;left:50%;transform:translateX(-50%);box-shadow:0 8px 30px rgba(201,168,76,0.25);z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.tut-eyes{display:flex;gap:16px;margin-bottom:6px;margin-top:8px}
+.tut-eye{width:10px;height:10px;border-radius:50%;background:#1a0a00;position:relative;animation:blink 4s ease-in-out infinite}
+.tut-eye::after{content:'';position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;top:2px;right:2px}
+@keyframes blink{0%,45%,55%,100%{transform:scaleY(1)}50%{transform:scaleY(0.1)}}
+.tut-mouth{width:14px;height:7px;border-radius:0 0 10px 10px;background:#8b1a1a}
+.tut-mouth.talking{animation:talk .3s ease infinite}
+@keyframes talk{0%,100%{height:7px}50%{height:12px;width:18px}}
+.tut-hat{position:absolute;top:-28px;left:50%;transform:translateX(-50%);width:120px;height:45px;background:linear-gradient(135deg,#1a0a00,#3d1f00);border-radius:6px 6px 0 0;z-index:4;border:2px solid rgba(201,168,76,0.35)}
+.tut-hat::before{content:'';position:absolute;top:-7px;left:50%;transform:translateX(-50%);width:16px;height:16px;background:var(--g);border-radius:50%;box-shadow:0 0 12px rgba(201,168,76,0.5)}
+.tut-hat::after{content:'';position:absolute;bottom:-3px;left:0;right:0;height:6px;background:var(--g);border-radius:0 0 3px 3px}
+.tut-robe{position:absolute;top:78px;left:50%;transform:translateX(-50%);width:130px;height:190px;background:linear-gradient(180deg,#1a0a00,#2d1500,#1a0a00);border-radius:0 0 28px 28px;z-index:2;border:1px solid rgba(201,168,76,0.15)}
+.tut-robe::before{content:'';position:absolute;top:16px;left:50%;transform:translateX(-50%);width:2px;height:130px;background:linear-gradient(180deg,var(--g),transparent)}
+.tut-arm{position:absolute;top:100px;width:45px;height:110px;z-index:1;background:linear-gradient(180deg,#1a0a00,#2d1500);border:1px solid rgba(201,168,76,0.1)}
+.tut-arm-l{left:10px;border-radius:18px 0 0 18px;animation:armW 3s ease-in-out infinite}
+.tut-arm-r{right:10px;border-radius:0 18px 18px 0;animation:armW 3s ease-in-out infinite 1.5s}
+@keyframes armW{0%,100%{transform:rotate(0)}50%{transform:rotate(-6deg)}}
+.tut-hand{position:absolute;bottom:-7px;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#f0d080,#c9a84c)}
+.tut-arm-l .tut-hand{left:0}.tut-arm-r .tut-hand{right:0}
+.tut-aura{position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,0.06),transparent 70%);animation:aurP 3s ease-in-out infinite}
+@keyframes aurP{0%,100%{opacity:0.4;transform:scale(0.95)}50%{opacity:1;transform:scale(1.05)}}
+.tut-platform{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:140px;height:16px;background:radial-gradient(ellipse,rgba(201,168,76,0.15),transparent);filter:blur(6px)}
+.tut-info{padding:16px 0}
+.tut-name{font-size:1.6rem;color:var(--gl);margin-bottom:6px}
+.tut-role{font-size:0.75rem;letter-spacing:3px;color:var(--g);text-transform:uppercase;margin-bottom:18px}
+.tut-speech{border-radius:20px;padding:22px;font-size:0.88rem;color:rgba(245,230,200,0.65);line-height:1.7;margin-bottom:16px;position:relative}
+.tut-topics{display:flex;gap:8px;flex-wrap:wrap}
+.tut-topic{padding:8px 16px;border:1px solid rgba(201,168,76,0.18);border-radius:50px;background:transparent;color:rgba(245,230,200,0.55);font-size:0.76rem;cursor:pointer;transition:all 0.3s;font-family:Georgia,serif;position:relative;overflow:hidden}
+.tut-topic:hover{background:rgba(201,168,76,0.08);color:var(--g);border-color:var(--g)}
 
-        /* ===== 3D TUTOR ===== */
-        .tutor-section{position:relative;overflow:hidden}
-        .tutor-container{
-            max-width:1000px;margin:0 auto;
-            display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;
-        }
-        @media(max-width:768px){.tutor-container{grid-template-columns:1fr;text-align:center}}
+/* FLASHCARD */
+.fc-ctrl{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.fc-prog{flex:1;min-width:200px}.fc-prog-bar{height:5px;background:rgba(201,168,76,0.08);border-radius:3px;overflow:hidden;margin-bottom:5px}.fc-prog-fill{height:100%;background:linear-gradient(90deg,var(--gd),var(--g));border-radius:3px;transition:width 0.4s}.fc-prog-txt{font-size:0.7rem;color:rgba(201,168,76,0.45);letter-spacing:1px}
+.fc-stats{display:flex;gap:8px}.fc-st{padding:5px 10px;border-radius:8px;font-size:0.7rem;border:1px solid rgba(201,168,76,0.1)}.fc-ok{color:#90d890}.fc-no{color:#d89090}
+.fc-stage{perspective:1200px;max-width:400px;margin:0 auto;position:relative;height:300px;touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.fc-card{position:absolute;inset:0;transition:transform 0.6s cubic-bezier(.4,0,.2,1),opacity 0.3s;transform-style:preserve-3d;cursor:pointer}
+.fc-card.flipped{transform:rotateY(180deg)}.fc-card.sl{transform:translateX(-120%) rotate(-15deg);opacity:0}.fc-card.sr{transform:translateX(120%) rotate(15deg);opacity:0}
+.fc-face{position:absolute;inset:0;border-radius:22px;padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;backface-visibility:hidden;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.4)}
+.fc-face::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gd),var(--gl),var(--gd));border-radius:22px 22px 0 0}
+.fc-back{transform:rotateY(180deg)}
+.fc-cat{font-size:0.62rem;letter-spacing:2.5px;color:var(--g);text-transform:uppercase;margin-bottom:16px;opacity:0.65}
+.fc-word{font-size:2.2rem;font-weight:bold;color:var(--gl);margin-bottom:8px;text-shadow:0 0 18px rgba(201,168,76,0.15)}
+.fc-hint{font-size:0.82rem;color:rgba(245,230,200,0.35);font-style:italic;margin-bottom:18px}
+.fc-flip{font-size:0.68rem;color:rgba(201,168,76,0.3);padding:5px 14px;border:1px solid rgba(201,168,76,0.1);border-radius:50px}
+.fc-meaning{font-size:1.5rem;color:var(--cr);margin-bottom:8px;font-weight:bold}
+.fc-ngk{font-size:0.82rem;color:rgba(201,168,76,0.55);font-style:italic;margin-bottom:10px}
+.fc-ex{font-size:0.78rem;color:rgba(245,230,200,0.5);line-height:1.6;border-left:2px solid var(--g);padding:8px 14px;border-radius:0 8px 8px 0;width:100%;text-align:left;background:rgba(201,168,76,0.03)}
+.fc-actions{display:flex;gap:12px;justify-content:center;margin-top:22px}
+.fc-btn{padding:11px 26px;border-radius:14px;border:none;font-size:0.85rem;font-weight:bold;cursor:pointer;font-family:Georgia,serif;transition:all 0.3s;position:relative;overflow:hidden}
+.fc-btn:hover{transform:translateY(-2px)}
+.fc-btn-h{background:rgba(139,26,26,0.25);border:1px solid rgba(154,74,74,0.35);color:#d89090}
+.fc-btn-o{background:rgba(26,74,26,0.25);border:1px solid rgba(74,154,74,0.35);color:#90d890}
+.fc-btn-e{background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);color:var(--g)}
+.fc-done{text-align:center;padding:30px 20px}
+.fc-done-t{font-size:1.8rem;color:var(--gl);margin-bottom:14px}
+.fc-done-stats{display:flex;justify-content:center;gap:30px;margin:18px 0}
+.fc-ds{text-align:center}.fc-ds-n{font-size:2.2rem;font-weight:900;display:block}.fc-ds-l{font-size:0.68rem;letter-spacing:2px;text-transform:uppercase;color:rgba(245,230,200,0.45)}
+.fc-ds-ok .fc-ds-n{color:#90d890}.fc-ds-no .fc-ds-n{color:#d89090}
 
-        .tutor-3d-stage{
-            position:relative;width:100%;aspect-ratio:1;max-width:400px;margin:0 auto;
-            perspective:1000px;
-        }
-        .tutor-character{
-            position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-            transform-style:preserve-3d;animation:tutorFloat 4s ease-in-out infinite;
-        }
-        @keyframes tutorFloat{0%,100%{transform:translateY(0) rotateY(0)}25%{transform:translateY(-12px) rotateY(3deg)}50%{transform:translateY(-20px) rotateY(0)}75%{transform:translateY(-12px) rotateY(-3deg)}}
+/* STORY MODE */
+.story-container{max-width:700px;margin:0 auto}
+.story-scene{border-radius:24px;overflow:hidden;position:relative;min-height:400px}
+.story-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:opacity 0.6s}
+.story-overlay{position:absolute;inset:0;background:linear-gradient(0deg,rgba(13,5,0,0.95) 0%,rgba(13,5,0,0.6) 40%,rgba(13,5,0,0.3) 100%)}
+.story-content{position:relative;z-index:2;padding:30px;display:flex;flex-direction:column;justify-content:flex-end;min-height:400px}
+.story-ep-tag{font-size:0.6rem;letter-spacing:3px;color:var(--g);text-transform:uppercase;margin-bottom:8px}
+.story-ep-title{font-size:1.3rem;color:var(--gl);margin-bottom:16px}
+.story-narrator{font-size:0.82rem;color:rgba(245,230,200,0.5);font-style:italic;line-height:1.6;margin-bottom:16px}
+.story-dialog-wrap{margin-bottom:16px}
+.story-speaker{font-size:0.7rem;letter-spacing:2px;color:var(--g);text-transform:uppercase;margin-bottom:6px}
+.story-dialog-text{font-size:1rem;color:var(--cr);line-height:1.5;padding:14px 18px;border-radius:14px;background:rgba(29,14,0,0.7);border:1px solid rgba(201,168,76,0.12);position:relative;overflow:hidden}
+.story-typing-cursor{display:inline-block;width:2px;height:1em;background:var(--g);animation:blinker 0.6s step-end infinite;vertical-align:text-bottom;margin-left:2px}
+@keyframes blinker{50%{opacity:0}}
+.story-choices{display:grid;gap:10px}
+.story-choice{padding:14px 18px;border-radius:14px;border:1px solid rgba(201,168,76,0.15);background:rgba(29,14,0,0.6);backdrop-filter:blur(8px);color:var(--cr);font-size:0.88rem;cursor:pointer;transition:all 0.3s;font-family:Georgia,serif;text-align:left;position:relative;overflow:hidden}
+.story-choice:hover{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.06);transform:translateX(5px)}
+.story-choice.correct{background:rgba(26,74,26,0.35);border-color:#4a9a4a;color:#90d890}
+.story-choice.wrong{background:rgba(139,26,26,0.35);border-color:#9a4a4a;color:#d89090}
+.story-choice:disabled{cursor:not-allowed;opacity:0.7}
+.story-choice-letter{display:inline-block;width:24px;height:24px;border-radius:6px;background:rgba(201,168,76,0.1);text-align:center;line-height:24px;font-size:0.75rem;color:var(--g);margin-right:10px;font-weight:bold}
+.story-feedback{padding:12px 16px;border-radius:12px;font-size:0.82rem;line-height:1.6;margin-top:12px;display:none}
+.story-feedback.show{display:block;animation:fadeIn 0.3s}
+.story-feedback.ok{background:rgba(26,74,26,0.25);border:1px solid rgba(74,154,74,0.3);color:#90d890}
+.story-feedback.no{background:rgba(139,26,26,0.25);border:1px solid rgba(154,74,74,0.3);color:#d89090}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.story-nav{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+.story-progress{display:flex;gap:6px}
+.story-dot{width:8px;height:8px;border-radius:50%;background:rgba(201,168,76,0.15);transition:all 0.3s}
+.story-dot.active{background:var(--g);width:20px;border-radius:4px}
+.story-dot.done{background:rgba(201,168,76,0.5)}
+.story-next-btn{padding:10px 24px;border-radius:50px;background:linear-gradient(135deg,var(--g),var(--gd));color:var(--bg);border:none;font-size:0.85rem;font-weight:bold;cursor:pointer;font-family:Georgia,serif;transition:all 0.3s;display:none}
+.story-next-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(201,168,76,0.3)}
+.story-next-btn.visible{display:inline-block}
+.story-ep-select{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;justify-content:center}
+.story-ep-btn{padding:10px 20px;border-radius:14px;border:1px solid rgba(201,168,76,0.15);background:transparent;color:rgba(245,230,200,0.55);font-size:0.8rem;cursor:pointer;transition:all 0.3s;font-family:Georgia,serif}
+.story-ep-btn:hover,.story-ep-btn.active{background:rgba(201,168,76,0.08);border-color:var(--g);color:var(--g)}
+.story-ep-btn.locked{opacity:0.4;cursor:not-allowed}
 
-        .tutor-body{position:relative;width:200px;height:300px}
-        .tutor-head{
-            width:100px;height:100px;border-radius:50%;
-            background:linear-gradient(135deg,#f0d080,#c9a84c);
-            position:absolute;top:0;left:50%;transform:translateX(-50%);
-            box-shadow:0 8px 30px rgba(201,168,76,0.3);
-            z-index:3;display:flex;align-items:center;justify-content:center;
-            flex-direction:column;
-        }
-        .tutor-eyes{display:flex;gap:18px;margin-bottom:8px;margin-top:10px}
-        .tutor-eye{
-            width:12px;height:12px;border-radius:50%;background:#1a0a00;
-            position:relative;animation:blink 4s ease-in-out infinite;
-        }
-        .tutor-eye::after{
-            content:'';position:absolute;width:4px;height:4px;border-radius:50%;
-            background:#fff;top:2px;right:2px;
-        }
-        @keyframes blink{0%,45%,55%,100%{transform:scaleY(1)}50%{transform:scaleY(0.1)}}
-        .tutor-mouth{width:16px;height:8px;border-radius:0 0 10px 10px;background:#8b1a1a}
-        .tutor-mouth.talking{animation:talk .3s ease infinite}
-        @keyframes talk{0%,100%{height:8px}50%{height:14px;width:20px}}
+/* VOCAB */
+.vocab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.vocab-card{border-radius:20px;padding:26px;position:relative;overflow:hidden;transition:all 0.4s cubic-bezier(.175,.885,.32,1.275);cursor:pointer}
+.vocab-card:hover{transform:translateY(-8px) scale(1.01)}
+.vc-cat{font-size:0.62rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(201,168,76,0.6);margin-bottom:10px}
+.vc-jawa{font-size:1.6rem;font-weight:bold;color:var(--gl);margin-bottom:5px}
+.vc-indo{font-size:0.92rem;color:var(--cr);margin-bottom:5px}
+.vc-ngoko{font-size:0.78rem;color:rgba(245,230,200,0.4);font-style:italic;margin-bottom:12px}
+.vc-ngoko span{color:rgba(201,168,76,0.55)}
+.vc-num{position:absolute;bottom:12px;right:16px;font-size:2.4rem;font-weight:900;color:rgba(201,168,76,0.04);line-height:1}
+.speak-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:50px;font-size:0.72rem;color:var(--g);cursor:pointer;transition:all 0.3s;font-family:Georgia,serif}
+.speak-btn:hover{background:rgba(201,168,76,0.14)}
+.play-tri{width:0;height:0;border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:8px solid var(--g);display:inline-block}
 
-        .tutor-hat{
-            position:absolute;top:-30px;left:50%;transform:translateX(-50%);
-            width:130px;height:50px;background:linear-gradient(135deg,#1a0a00,#3d1f00);
-            border-radius:8px 8px 0 0;z-index:4;
-            border:2px solid rgba(201,168,76,0.4);
-        }
-        .tutor-hat::before{
-            content:'';position:absolute;top:-8px;left:50%;transform:translateX(-50%);
-            width:20px;height:20px;background:var(--gold);border-radius:50%;
-            box-shadow:0 0 15px rgba(201,168,76,0.5);
-        }
-        .tutor-hat::after{
-            content:'';position:absolute;bottom:-4px;left:0;right:0;height:8px;
-            background:var(--gold);border-radius:0 0 4px 4px;
-        }
-
-        .tutor-robe{
-            position:absolute;top:85px;left:50%;transform:translateX(-50%);
-            width:140px;height:200px;
-            background:linear-gradient(180deg,#1a0a00 0%,#2d1500 50%,#1a0a00 100%);
-            border-radius:0 0 30px 30px;z-index:2;
-            border:2px solid rgba(201,168,76,0.2);
-        }
-        .tutor-robe::before{
-            content:'';position:absolute;top:20px;left:50%;transform:translateX(-50%);
-            width:2px;height:140px;background:linear-gradient(180deg,var(--gold),transparent);
-        }
-        .tutor-robe-pattern{
-            position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
-            width:100px;height:40px;
-            border:1px solid rgba(201,168,76,0.15);
-            border-radius:0 0 20px 20px;
-        }
-
-        .tutor-arm{
-            position:absolute;top:110px;width:50px;height:120px;z-index:1;
-            background:linear-gradient(180deg,#1a0a00,#2d1500);
-            border:1px solid rgba(201,168,76,0.15);
-        }
-        .tutor-arm-left{left:10px;border-radius:20px 0 0 20px;transform-origin:top right;animation:armWave 3s ease-in-out infinite}
-        .tutor-arm-right{right:10px;border-radius:0 20px 20px 0;transform-origin:top left;animation:armWave 3s ease-in-out infinite 1.5s}
-        @keyframes armWave{0%,100%{transform:rotate(0)}50%{transform:rotate(-8deg)}}
-
-        .tutor-hand{
-            position:absolute;bottom:-8px;width:24px;height:24px;border-radius:50%;
-            background:linear-gradient(135deg,#f0d080,#c9a84c);
-        }
-        .tutor-arm-left .tutor-hand{left:0}
-        .tutor-arm-right .tutor-hand{right:0}
-
-        .tutor-aura{
-            position:absolute;inset:-30px;border-radius:50%;
-            background:radial-gradient(circle,rgba(201,168,76,0.08) 0%,transparent 70%);
-            animation:auraPulse 3s ease-in-out infinite;
-        }
-        @keyframes auraPulse{0%,100%{opacity:0.5;transform:scale(0.95)}50%{opacity:1;transform:scale(1.05)}}
-
-        .tutor-platform{
-            position:absolute;bottom:0;left:50%;transform:translateX(-50%);
-            width:160px;height:20px;
-            background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(139,105,20,0.1));
-            border-radius:50%;filter:blur(8px);
-        }
-
-        .tutor-info{padding:20px 0}
-        .tutor-name{font-size:1.8rem;color:var(--gold-l);margin-bottom:8px}
-        .tutor-role{font-size:0.8rem;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:20px}
-        .tutor-speech{
-            background:rgba(29,14,0,0.8);border:1px solid rgba(201,168,76,0.15);
-            border-radius:20px;padding:22px;position:relative;
-            font-size:0.92rem;color:rgba(245,230,200,0.7);line-height:1.7;
-            margin-bottom:18px;
-        }
-        .tutor-speech::before{
-            content:'';position:absolute;left:-12px;top:30px;
-            border:8px solid transparent;border-right-color:rgba(201,168,76,0.15);
-        }
-        @media(max-width:768px){
-            .tutor-speech::before{display:none}
-        }
-        .tutor-topic-btns{display:flex;gap:8px;flex-wrap:wrap}
-        .tutor-topic{
-            padding:8px 16px;border:1px solid rgba(201,168,76,0.2);border-radius:50px;
-            background:transparent;color:rgba(245,230,200,0.6);font-size:0.78rem;
-            cursor:pointer;transition:all 0.3s;font-family:Georgia,serif;
-        }
-        .tutor-topic:hover{background:rgba(201,168,76,0.1);color:var(--gold);border-color:var(--gold)}
-
-        /* ===== FLASHCARD SECTION ===== */
-        .fc-controls{
-            display:flex;justify-content:space-between;align-items:center;
-            margin-bottom:20px;flex-wrap:wrap;gap:12px;
-        }
-        .fc-progress-wrap{flex:1;min-width:200px}
-        .fc-progress-bar{height:6px;background:rgba(201,168,76,0.1);border-radius:3px;overflow:hidden;margin-bottom:6px}
-        .fc-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold));border-radius:3px;transition:width 0.4s ease}
-        .fc-progress-text{font-size:0.72rem;color:rgba(201,168,76,0.5);letter-spacing:1px}
-        .fc-stats{display:flex;gap:10px}
-        .fc-stat{
-            padding:6px 12px;border-radius:8px;font-size:0.72rem;
-            background:rgba(29,14,0,0.8);border:1px solid rgba(201,168,76,0.12);
-        }
-        .fc-stat-ok{color:#90d890}.fc-stat-no{color:#d89090}.fc-stat-skip{color:rgba(245,230,200,0.5)}
-
-        .fc-stage{
-            perspective:1200px;max-width:420px;margin:0 auto;
-            position:relative;height:320px;
-            touch-action:pan-y;
-            -webkit-user-select:none;user-select:none;
-        }
-        .fc-card{
-            position:absolute;inset:0;
-            transition:transform 0.6s cubic-bezier(.4,0,.2,1),opacity 0.3s ease;
-            transform-style:preserve-3d;cursor:pointer;
-        }
-        .fc-card.flipped{transform:rotateY(180deg)}
-        .fc-card.swipe-left{transform:translateX(-120%) rotate(-15deg);opacity:0}
-        .fc-card.swipe-right{transform:translateX(120%) rotate(15deg);opacity:0}
-
-        .fc-face{
-            position:absolute;inset:0;
-            background:rgba(22,10,0,0.96);border:1px solid rgba(201,168,76,0.2);
-            border-radius:24px;padding:30px;
-            display:flex;flex-direction:column;align-items:center;justify-content:center;
-            backface-visibility:hidden;text-align:center;
-            box-shadow:0 20px 60px rgba(0,0,0,0.5);
-        }
-        .fc-face::before{
-            content:'';position:absolute;top:0;left:0;right:0;height:3px;
-            background:linear-gradient(90deg,var(--gold-d),var(--gold-l),var(--gold-d));
-            border-radius:24px 24px 0 0;
-        }
-        .fc-back{transform:rotateY(180deg)}
-
-        .fc-cat{font-size:0.65rem;letter-spacing:2.5px;color:var(--gold);text-transform:uppercase;margin-bottom:16px;opacity:0.7}
-        .fc-word{font-size:2.4rem;font-weight:bold;color:var(--gold-l);margin-bottom:8px;text-shadow:0 0 20px rgba(201,168,76,0.2)}
-        .fc-hint{font-size:0.85rem;color:rgba(245,230,200,0.4);font-style:italic;margin-bottom:20px}
-        .fc-flip-hint{
-            font-size:0.72rem;color:rgba(201,168,76,0.35);
-            padding:6px 16px;border:1px solid rgba(201,168,76,0.12);border-radius:50px;
-        }
-
-        .fc-meaning{font-size:1.6rem;color:var(--cream);margin-bottom:10px;font-weight:bold}
-        .fc-ngoko-text{font-size:0.85rem;color:rgba(201,168,76,0.6);margin-bottom:12px;font-style:italic}
-        .fc-example{
-            font-size:0.82rem;color:rgba(245,230,200,0.55);line-height:1.6;
-            background:rgba(201,168,76,0.04);border-left:2px solid var(--gold);
-            padding:10px 14px;border-radius:0 8px 8px 0;width:100%;text-align:left;
-        }
-
-        .fc-actions{
-            display:flex;gap:12px;justify-content:center;margin-top:24px;
-        }
-        .fc-btn{
-            padding:12px 28px;border-radius:14px;border:none;
-            font-size:0.88rem;font-weight:bold;cursor:pointer;
-            font-family:Georgia,serif;transition:all 0.3s;
-        }
-        .fc-btn:hover{transform:translateY(-2px)}
-        .fc-btn-hard{background:rgba(139,26,26,0.3);border:1px solid rgba(154,74,74,0.4);color:#d89090}
-        .fc-btn-hard:hover{background:rgba(139,26,26,0.5)}
-        .fc-btn-ok{background:rgba(26,74,26,0.3);border:1px solid rgba(74,154,74,0.4);color:#90d890}
-        .fc-btn-ok:hover{background:rgba(26,74,26,0.5)}
-        .fc-btn-easy{background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);color:var(--gold)}
-        .fc-btn-easy:hover{background:rgba(201,168,76,0.3)}
-
-        .fc-complete{
-            text-align:center;padding:40px 20px;
-        }
-        .fc-complete-title{font-size:2rem;color:var(--gold-l);margin-bottom:12px}
-        .fc-complete-stats{
-            display:flex;justify-content:center;gap:30px;margin:20px 0;
-        }
-        .fc-cs{text-align:center}
-        .fc-cs-num{font-size:2.4rem;font-weight:900;display:block}
-        .fc-cs-lbl{font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:rgba(245,230,200,0.5)}
-        .fc-cs-ok .fc-cs-num{color:#90d890}.fc-cs-no .fc-cs-num{color:#d89090}
-
-        /* ===== AR KAMUS ===== */
-        .ar-container{
-            max-width:600px;margin:0 auto;
-            border-radius:24px;overflow:hidden;
-            border:1px solid rgba(201,168,76,0.2);
-            position:relative;background:#000;
-        }
-        .ar-video-wrap{position:relative;width:100%;aspect-ratio:4/3;background:#111;overflow:hidden}
-        .ar-video-wrap video{width:100%;height:100%;object-fit:cover;display:block}
-        .ar-overlay{position:absolute;inset:0;pointer-events:none}
-        .ar-corners{position:absolute;inset:20px}
-        .ar-corner{position:absolute;width:30px;height:30px;border-color:var(--gold);border-style:solid}
-        .ar-corner-tl{top:0;left:0;border-width:2px 0 0 2px;border-radius:4px 0 0 0}
-        .ar-corner-tr{top:0;right:0;border-width:2px 2px 0 0;border-radius:0 4px 0 0}
-        .ar-corner-bl{bottom:0;left:0;border-width:0 0 2px 2px;border-radius:0 0 0 4px}
-        .ar-corner-br{bottom:0;right:0;border-width:0 2px 2px 0;border-radius:0 0 4px 0}
-        .ar-scan-line{
-            position:absolute;left:0;right:0;height:2px;
-            background:linear-gradient(90deg,transparent,var(--gold),transparent);
-            animation:arScan 2.5s ease-in-out infinite;opacity:0.6;
-        }
-        @keyframes arScan{0%{top:10%}50%{top:85%}100%{top:10%}}
-
-        .ar-label{
-            position:absolute;pointer-events:auto;
-            padding:8px 16px;
-            background:rgba(13,5,0,0.92);border:1px solid rgba(201,168,76,0.5);
-            border-radius:10px;color:var(--gold-l);font-size:0.85rem;
-            display:flex;align-items:center;gap:8px;cursor:pointer;
-            animation:arLabelIn 0.4s cubic-bezier(.175,.885,.32,1.275);
-            box-shadow:0 4px 20px rgba(0,0,0,0.5),0 0 15px rgba(201,168,76,0.15);
-            white-space:nowrap;
-        }
-        @keyframes arLabelIn{from{opacity:0;transform:scale(0.7) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-        .ar-label-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);animation:arDotPulse 1.5s ease infinite}
-        @keyframes arDotPulse{0%,100%{opacity:0.5;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
-        .ar-label-sub{font-size:0.7rem;color:rgba(245,230,200,0.45);margin-left:4px}
-
-        .ar-bottom{
-            padding:20px;display:flex;flex-direction:column;align-items:center;gap:14px;
-            background:rgba(13,5,0,0.95);
-        }
-        .ar-status{font-size:0.78rem;color:rgba(201,168,76,0.6);letter-spacing:1.5px}
-        .ar-btn-row{display:flex;gap:10px}
-        .ar-btn{
-            padding:10px 24px;border-radius:50px;border:none;
-            font-size:0.85rem;cursor:pointer;font-family:Georgia,serif;transition:all 0.3s;
-        }
-        .ar-btn-start{background:linear-gradient(135deg,var(--gold),var(--gold-d));color:var(--bg);font-weight:bold}
-        .ar-btn-start:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(201,168,76,0.4)}
-        .ar-btn-stop{background:transparent;border:1px solid rgba(201,168,76,0.3);color:var(--gold)}
-        .ar-btn-stop:hover{background:rgba(201,168,76,0.06)}
-
-        .ar-detected-grid{
-            display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-            gap:10px;width:100%;margin-top:10px;
-        }
-        .ar-detected-item{
-            padding:12px;background:rgba(29,14,0,0.8);border:1px solid rgba(201,168,76,0.12);
-            border-radius:12px;text-align:center;font-size:0.82rem;
-            transition:all 0.3s;cursor:pointer;
-        }
-        .ar-detected-item:hover{border-color:rgba(201,168,76,0.4)}
-        .ar-det-jawa{color:var(--gold-l);font-weight:bold;font-size:0.95rem;margin-bottom:3px}
-        .ar-det-indo{color:rgba(245,230,200,0.5);font-size:0.75rem}
-
-        .ar-permission-msg{
-            padding:40px 20px;text-align:center;
-        }
-        .ar-perm-title{font-size:1.2rem;color:var(--gold-l);margin-bottom:12px}
-        .ar-perm-desc{font-size:0.88rem;color:rgba(245,230,200,0.5);line-height:1.7;margin-bottom:20px}
-
-        /* ===== VOCAB CARD ===== */
-        .vocab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
-        .vocab-card{background:rgba(29,14,0,0.9);border:1px solid rgba(201,168,76,0.13);border-radius:18px;padding:26px;position:relative;overflow:hidden;transition:all 0.35s;cursor:pointer}
-        .vocab-card:hover{transform:translateY(-8px);border-color:rgba(201,168,76,0.38);box-shadow:0 20px 60px rgba(0,0,0,0.45)}
-        .vc-cat{font-size:0.65rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(201,168,76,0.65);margin-bottom:10px}
-        .vc-jawa{font-size:1.7rem;font-weight:bold;color:var(--gold-l);margin-bottom:6px}
-        .vc-indo{font-size:0.95rem;color:var(--cream);margin-bottom:6px}
-        .vc-ngoko{font-size:0.8rem;color:rgba(245,230,200,0.45);font-style:italic;margin-bottom:14px}
-        .vc-ngoko span{color:rgba(201,168,76,0.6)}
-        .vc-num{position:absolute;bottom:14px;right:18px;font-size:2.6rem;font-weight:900;color:rgba(201,168,76,0.05);line-height:1}
-        .speak-btn{display:inline-flex;align-items:center;gap:7px;padding:7px 16px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:50px;font-size:0.76rem;color:var(--gold);cursor:pointer;transition:all 0.3s;font-family:Georgia,serif}
-        .speak-btn:hover{background:rgba(201,168,76,0.18)}
-        .play-tri{width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:9px solid var(--gold);display:inline-block}
-
-        /* ===== FOOTER ===== */
-        .footer{padding:50px 24px 36px;border-top:1px solid rgba(201,168,76,0.08);background:rgba(13,5,0,0.7)}
-        .footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:36px;margin-bottom:36px}
-        .footer-brand h3{font-size:1.3rem;color:var(--gold);margin-bottom:10px}
-        .footer-brand p{color:rgba(245,230,200,0.45);font-size:0.84rem;line-height:1.7}
-        .footer-col h4{color:var(--gold-l);margin-bottom:14px;font-size:0.9rem}
-        .footer-col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
-        .footer-col a{color:rgba(245,230,200,0.45);text-decoration:none;font-size:0.84rem;transition:color 0.3s}
-        .footer-col a:hover{color:var(--gold)}
-        .footer-bottom{max-width:1100px;margin:0 auto;padding-top:24px;border-top:1px solid rgba(201,168,76,0.07);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-        .footer-bottom p{color:rgba(245,230,200,0.3);font-size:0.78rem}
-    </style>
+/* FOOTER */
+.footer{padding:50px 24px 36px;border-top:1px solid rgba(201,168,76,0.06);background:rgba(13,5,0,0.6)}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:36px;margin-bottom:30px}
+.footer-brand h3{font-size:1.2rem;color:var(--g);margin-bottom:10px}.footer-brand p{color:rgba(245,230,200,0.4);font-size:0.82rem;line-height:1.7}
+.footer-col h4{color:var(--gl);margin-bottom:12px;font-size:0.85rem}.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:7px}.footer-col a{color:rgba(245,230,200,0.4);text-decoration:none;font-size:0.82rem;transition:color 0.3s}.footer-col a:hover{color:var(--g)}
+.footer-bottom{max-width:1100px;margin:0 auto;padding-top:20px;border-top:1px solid rgba(201,168,76,0.06);text-align:center}
+.footer-bottom p{color:rgba(245,230,200,0.25);font-size:0.75rem}
+</style>
 </head>
 <body>
 
-<!-- ONBOARDING -->
-<div class="onboard-overlay" id="onboard">
-    <div class="onboard-container">
-        <div class="ob-particles" id="obParticles"></div>
-        <div class="ob-ring" style="width:400px;height:400px;top:50%;left:50%"></div>
-        <div class="ob-ring" style="width:280px;height:280px;top:50%;left:50%;animation-direction:reverse;animation-duration:14s"></div>
-
-        <div class="onboard-steps">
-            <!-- Step 0: Splash -->
-            <div class="onboard-step active" id="obStep0">
-                <div class="ob-splash-title">Sinau Basa Jawa</div>
-                <div class="ob-splash-sub">Krama Inggil</div>
-                <div class="ob-splash-line"></div>
-                <p class="ob-desc">Platform pembelajaran Bahasa Jawa halus paling interaktif dengan tutor virtual dan teknologi modern.</p>
-                <button class="ob-btn" onclick="obNext(1)">Miwiti Sinau</button>
-                <button class="ob-btn-ghost" onclick="obSkip()">Langsung Masuk</button>
-            </div>
-
-            <!-- Step 1: Avatar -->
-            <div class="onboard-step" id="obStep1">
-                <div class="ob-tag">Langkah 1 / 4</div>
-                <h2 class="ob-title">Pilih Karakter Anda</h2>
-                <p class="ob-desc">Karakter akan menemani perjalanan belajar Anda</p>
-                <div class="avatar-grid">
-                    <div class="avatar-option selected" onclick="pickAvatar(this,1)">
-                        <div class="av-char av-char-1">M</div>
-                        <div class="av-name">Mbah Guru</div>
-                        <div class="av-role">Guru Bijaksana</div>
-                    </div>
-                    <div class="avatar-option" onclick="pickAvatar(this,2)">
-                        <div class="av-char av-char-2">R</div>
-                        <div class="av-name">Rara Ayu</div>
-                        <div class="av-role">Teman Belajar</div>
-                    </div>
-                    <div class="avatar-option" onclick="pickAvatar(this,3)">
-                        <div class="av-char av-char-3">A</div>
-                        <div class="av-name">Arjuna</div>
-                        <div class="av-role">Ksatria Budaya</div>
-                    </div>
-                    <div class="avatar-option" onclick="pickAvatar(this,4)">
-                        <div class="av-char av-char-4">S</div>
-                        <div class="av-name">Srikandi</div>
-                        <div class="av-role">Pejuang Tangguh</div>
-                    </div>
-                </div>
-                <button class="ob-btn" onclick="obNext(2)">Lanjutaken</button>
-            </div>
-
-            <!-- Step 2: Placement Test -->
-            <div class="onboard-step" id="obStep2">
-                <div class="ob-tag">Langkah 2 / 4</div>
-                <h2 class="ob-title">Tes Penempatan</h2>
-                <p class="ob-desc">Jawab 3 soal singkat untuk menentukan level awal Anda</p>
-                <div id="obTestArea"></div>
-            </div>
-
-            <!-- Step 3: Daily Goal -->
-            <div class="onboard-step" id="obStep3">
-                <div class="ob-tag">Langkah 3 / 4</div>
-                <h2 class="ob-title">Target Harian</h2>
-                <p class="ob-desc">Berapa lama Anda ingin belajar setiap hari?</p>
-                <div class="goal-grid">
-                    <div class="goal-option" onclick="pickGoal(this,5)"><div class="goal-mins">5</div><div class="goal-text"><div class="goal-text-main">5 menit/hari</div><div class="goal-text-sub">Santai, perlahan tapi pasti</div></div></div>
-                    <div class="goal-option selected" onclick="pickGoal(this,10)"><div class="goal-mins">10</div><div class="goal-text"><div class="goal-text-main">10 menit/hari</div><div class="goal-text-sub">Seimbang dan konsisten</div></div></div>
-                    <div class="goal-option" onclick="pickGoal(this,15)"><div class="goal-mins">15</div><div class="goal-text"><div class="goal-text-main">15 menit/hari</div><div class="goal-text-sub">Serius dan fokus</div></div></div>
-                    <div class="goal-option" onclick="pickGoal(this,20)"><div class="goal-mins">20</div><div class="goal-text"><div class="goal-text-main">20 menit/hari</div><div class="goal-text-sub">Intensif dan cepat mahir</div></div></div>
-                </div>
-                <button class="ob-btn" onclick="obNext(4)">Lanjutaken</button>
-            </div>
-
-            <!-- Step 4: Done -->
-            <div class="onboard-step" id="obStep4">
-                <div class="ob-tag">Siap!</div>
-                <div class="ob-result-level" id="obResultLevel">Pemula</div>
-                <h2 class="ob-title">Sugeng Rawuh!</h2>
-                <p class="ob-desc" id="obResultMsg">Perjalanan belajar Bahasa Jawa Krama Inggil Anda dimulai sekarang. Selamat belajar!</p>
-                <button class="ob-btn" onclick="obFinish()">Mulai Belajar</button>
-            </div>
-        </div>
-
-        <div class="ob-dots" id="obDots">
-            <div class="ob-dot active"></div>
-            <div class="ob-dot"></div>
-            <div class="ob-dot"></div>
-            <div class="ob-dot"></div>
-            <div class="ob-dot"></div>
-        </div>
-    </div>
+<!-- CINEMATIC LOADER -->
+<div class="cine-loader" id="cineLoader">
+    <div class="cine-particles" id="cineParticles"></div>
+    <div class="cine-line" id="cineLine"></div>
+    <div class="cine-aksara" id="cineAksara"></div>
+    <div class="cine-logo" id="cineLogo">Sinau Basa Jawa</div>
+    <div class="cine-sub" id="cineSub">Krama Inggil</div>
 </div>
+
+<!-- CURSOR -->
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="cursor-dot" id="cursorDot"></div>
 
 <div class="notif" id="notif"></div>
 <canvas id="bgCanvas"></canvas>
 
-<div class="wrapper" id="mainApp" style="display:none">
-
-    <!-- NAVBAR -->
-    <nav class="navbar">
+<div class="wrapper" id="mainApp">
+    <nav class="navbar" id="navbar">
         <div class="nav-logo">Sinau Basa Jawa</div>
         <div class="nav-menu">
             <a href="#tutor">Tutor</a>
             <a href="#flashcard">Flashcard</a>
-            <a href="#ar-kamus">AR Kamus</a>
+            <a href="#story">Cerita</a>
             <a href="#kosakata">Kosakata</a>
         </div>
         <div class="nav-user">
-            <div class="nav-streak"><span class="streak-fire" id="streakNum">0</span> hari</div>
-            <div class="nav-xp"><span id="xpNum">0</span> XP</div>
-            <div class="nav-av av-char-1" id="navAv">M</div>
+            <div class="nav-streak"><span class="streak-fire" id="streakN">1</span> hari</div>
+            <div class="nav-xp"><span id="xpN">0</span> XP</div>
+            <div class="nav-av" id="navAv" style="background:linear-gradient(135deg,#8b6914,#3d1f00);color:#f0d080">M</div>
         </div>
     </nav>
 
     <!-- HERO -->
     <section class="hero" id="home">
         <div class="hero-ring"></div><div class="hero-ring"></div><div class="hero-ring"></div>
-        <div class="hero-badge">Platform Pembelajaran</div>
+        <div class="hero-badge">Platform Pembelajaran Interaktif</div>
         <h1 class="hero-title"><span class="t1">Sinau</span><span class="t2">Basa Jawa</span><span class="t3">Krama Inggil</span></h1>
-        <p class="hero-sub">Pelajari Bahasa Jawa Krama Inggil dengan tutor virtual 3D, flashcard cerdas, dan teknologi AR untuk kamus interaktif.</p>
-        <div class="hero-btns">
-            <a href="#tutor" class="btn-gold">Temui Tutor</a>
-            <a href="#flashcard" class="btn-outline">Mulai Flashcard</a>
+        <p class="hero-sub">Pelajari Bahasa Jawa Krama Inggil dengan tutor 3D, flashcard cerdas, cerita interaktif, dan UI kelas dunia.</p>
+        <div class="hero-btns"><a href="#tutor" class="btn-gold">Temui Tutor</a><a href="#story" class="btn-outline">Mulai Cerita</a></div>
+        <div class="wotd-card glass" id="wotdCard">
+            <div class="wotd-label">Kata Hari Ini</div>
+            <div class="wotd-word" id="wotdWord">Dhahar</div>
+            <div class="wotd-meaning" id="wotdMeaning">Makan (Krama Inggil)</div>
         </div>
     </section>
 
-    <div class="divider"><span class="di">&#9670;</span></div>
+    <div class="divider"><span style="color:var(--g);font-size:0.9rem;vertical-align:middle">&#9670;</span></div>
 
-    <!-- 3D TUTOR -->
-    <div class="bg-alt">
-    <section class="sec tutor-section" id="tutor">
-        <div class="sec-head">
-            <div class="sec-tag">Guru Virtual</div>
-            <h2 class="sec-title">Temui <span>Mbah Guru</span></h2>
-            <div class="sec-line"></div>
-            <p class="sec-desc">Tutor virtual yang siap mengajarkan Bahasa Jawa Krama Inggil kapan saja</p>
-        </div>
-        <div class="tutor-container">
-            <div class="tutor-3d-stage rv">
-                <div class="tutor-aura"></div>
-                <div class="tutor-character">
-                    <div class="tutor-body">
-                        <div class="tutor-hat"></div>
-                        <div class="tutor-head">
-                            <div class="tutor-eyes"><div class="tutor-eye"></div><div class="tutor-eye"></div></div>
-                            <div class="tutor-mouth" id="tutorMouth"></div>
-                        </div>
-                        <div class="tutor-arm tutor-arm-left"><div class="tutor-hand"></div></div>
-                        <div class="tutor-arm tutor-arm-right"><div class="tutor-hand"></div></div>
-                        <div class="tutor-robe"><div class="tutor-robe-pattern"></div></div>
-                    </div>
-                </div>
-                <div class="tutor-platform"></div>
+    <!-- TUTOR (skeleton first) -->
+    <div class="bg-alt parallax-section">
+    <section class="sec" id="tutor">
+        <div class="sec-head"><div class="sec-tag">Guru Virtual</div><h2 class="sec-title">Temui <span>Mbah Guru</span></h2><div class="sec-line"></div><p class="sec-desc">Tutor virtual siap mengajarkan Krama Inggil kapan saja</p></div>
+        <div id="tutorSkelWrap"></div>
+        <div class="tutor-grid" id="tutorContent" style="display:none">
+            <div class="tutor-stage rv">
+                <div class="tut-aura"></div>
+                <div class="tutor-char"><div class="tut-body">
+                    <div class="tut-hat"></div>
+                    <div class="tut-head"><div class="tut-eyes"><div class="tut-eye"></div><div class="tut-eye"></div></div><div class="tut-mouth" id="tutMouth"></div></div>
+                    <div class="tut-arm tut-arm-l"><div class="tut-hand"></div></div>
+                    <div class="tut-arm tut-arm-r"><div class="tut-hand"></div></div>
+                    <div class="tut-robe"></div>
+                </div></div>
+                <div class="tut-platform"></div>
             </div>
-            <div class="tutor-info rv d2">
-                <div class="tutor-name">Mbah Guru</div>
-                <div class="tutor-role">Guru Basa Jawa Krama Inggil</div>
-                <div class="tutor-speech" id="tutorSpeech">
-                    Sugeng rawuh, nak. Kula Mbah Guru, siap nuntun panjenengan sinau Basa Jawa Krama Inggil. Pilih topik ing ngandhap kangge miwiti sinau.
-                </div>
-                <div class="tutor-topic-btns">
-                    <button class="tutor-topic" onclick="tutorTalk('sapaan')">Sapaan Dasar</button>
-                    <button class="tutor-topic" onclick="tutorTalk('makan')">Ungkapan Makan</button>
-                    <button class="tutor-topic" onclick="tutorTalk('keluarga')">Keluarga</button>
-                    <button class="tutor-topic" onclick="tutorTalk('angka')">Angka</button>
-                    <button class="tutor-topic" onclick="tutorTalk('waktu')">Waktu</button>
-                    <button class="tutor-topic" onclick="tutorTalk('pasar')">Di Pasar</button>
+            <div class="tut-info rv d2">
+                <div class="tut-name">Mbah Guru</div>
+                <div class="tut-role">Guru Basa Jawa Krama Inggil</div>
+                <div class="tut-speech glass" id="tutSpeech">Sugeng rawuh, nak. Kula Mbah Guru, siap nuntun panjenengan sinau Basa Jawa Krama Inggil. Pilih topik kangge miwiti sinau.</div>
+                <div class="tut-topics">
+                    <button class="tut-topic" onclick="tutorTalk('sapaan')">Sapaan</button>
+                    <button class="tut-topic" onclick="tutorTalk('makan')">Makan/Minum</button>
+                    <button class="tut-topic" onclick="tutorTalk('keluarga')">Keluarga</button>
+                    <button class="tut-topic" onclick="tutorTalk('angka')">Angka</button>
+                    <button class="tut-topic" onclick="tutorTalk('waktu')">Waktu</button>
+                    <button class="tut-topic" onclick="tutorTalk('pasar')">Di Pasar</button>
                 </div>
             </div>
         </div>
     </section>
     </div>
 
-    <div class="divider"><span class="di">&#9670;</span></div>
+    <div class="divider"><span style="color:var(--g);font-size:0.9rem;vertical-align:middle">&#9670;</span></div>
 
-    <!-- FLASHCARD SRS -->
+    <!-- FLASHCARD -->
     <section class="sec" id="flashcard">
-        <div class="sec-head">
-            <div class="sec-tag">Latihan Hafalan</div>
-            <h2 class="sec-title">Flashcard <span>Cerdas</span></h2>
-            <div class="sec-line"></div>
-            <p class="sec-desc">Kartu bolak-balik dengan sistem pengulangan cerdas. Klik kartu untuk melihat arti, lalu nilai diri Anda.</p>
-        </div>
-        <div class="fc-controls">
-            <div class="fc-progress-wrap">
-                <div class="fc-progress-bar"><div class="fc-progress-fill" id="fcProgFill" style="width:0%"></div></div>
-                <div class="fc-progress-text" id="fcProgText">Kartu 0 / 0</div>
-            </div>
-            <div class="fc-stats">
-                <div class="fc-stat fc-stat-ok" id="fcOk">Hafal: 0</div>
-                <div class="fc-stat fc-stat-no" id="fcNo">Lupa: 0</div>
-            </div>
-        </div>
-        <div class="fc-stage" id="fcStage"></div>
-        <div class="fc-actions" id="fcActions" style="display:none">
-            <button class="fc-btn fc-btn-hard" onclick="fcRate('hard')">Sulit</button>
-            <button class="fc-btn fc-btn-ok" onclick="fcRate('ok')">Hafal</button>
-            <button class="fc-btn fc-btn-easy" onclick="fcRate('easy')">Mudah</button>
+        <div class="sec-head"><div class="sec-tag">Latihan Hafalan</div><h2 class="sec-title">Flashcard <span>Cerdas</span></h2><div class="sec-line"></div><p class="sec-desc">Kartu bolak-balik dengan pengulangan cerdas. Klik kartu untuk melihat arti.</p></div>
+        <div id="fcSkelWrap"></div>
+        <div id="fcReal" style="display:none">
+            <div class="fc-ctrl"><div class="fc-prog"><div class="fc-prog-bar"><div class="fc-prog-fill" id="fcPF" style="width:0%"></div></div><div class="fc-prog-txt" id="fcPT">Kartu 0/0</div></div><div class="fc-stats"><div class="fc-st fc-ok" id="fcOk">Hafal: 0</div><div class="fc-st fc-no" id="fcNo">Lupa: 0</div></div></div>
+            <div class="fc-stage" id="fcStage"></div>
+            <div class="fc-actions" id="fcAct" style="display:none"><button class="fc-btn fc-btn-h" onclick="fcRate('hard')">Sulit</button><button class="fc-btn fc-btn-o" onclick="fcRate('ok')">Hafal</button><button class="fc-btn fc-btn-e" onclick="fcRate('easy')">Mudah</button></div>
         </div>
     </section>
 
-    <div class="divider"><span class="di">&#9670;</span></div>
+    <div class="divider"><span style="color:var(--g);font-size:0.9rem;vertical-align:middle">&#9670;</span></div>
 
-    <!-- AR KAMUS -->
+    <!-- STORY MODE -->
     <div class="bg-alt">
-    <section class="sec" id="ar-kamus">
-        <div class="sec-head">
-            <div class="sec-tag">Teknologi AR</div>
-            <h2 class="sec-title">AR <span>Kamus</span></h2>
-            <div class="sec-line"></div>
-            <p class="sec-desc">Arahkan kamera ke objek di sekitar Anda dan pelajari nama Krama Inggil-nya secara langsung</p>
-        </div>
-        <div class="ar-container rv">
-            <div class="ar-video-wrap" id="arVideoWrap">
-                <video id="arVideo" autoplay playsinline muted></video>
-                <div class="ar-overlay" id="arOverlay">
-                    <div class="ar-corners">
-                        <div class="ar-corner ar-corner-tl"></div>
-                        <div class="ar-corner ar-corner-tr"></div>
-                        <div class="ar-corner ar-corner-bl"></div>
-                        <div class="ar-corner ar-corner-br"></div>
-                    </div>
-                    <div class="ar-scan-line"></div>
-                </div>
-                <div class="ar-permission-msg" id="arPermMsg">
-                    <div class="ar-perm-title">Kamus Augmented Reality</div>
-                    <p class="ar-perm-desc">Tekan tombol di bawah untuk membuka kamera. Arahkan kamera ke objek di sekitar Anda, dan nama Krama Inggil-nya akan muncul secara otomatis.</p>
-                </div>
-            </div>
-            <div class="ar-bottom">
-                <div class="ar-status" id="arStatus">Kamera belum aktif</div>
-                <div class="ar-btn-row">
-                    <button class="ar-btn ar-btn-start" id="arStartBtn" onclick="arStart()">Buka Kamera</button>
-                    <button class="ar-btn ar-btn-stop" id="arStopBtn" onclick="arStop()" style="display:none">Tutup Kamera</button>
-                    <button class="ar-btn ar-btn-stop" onclick="arSimulate()">Mode Demo</button>
-                </div>
-                <div class="ar-detected-grid" id="arDetected"></div>
-            </div>
+    <section class="sec" id="story">
+        <div class="sec-head"><div class="sec-tag">Cerita Interaktif</div><h2 class="sec-title">Petualangan <span>Basa Jawa</span></h2><div class="sec-line"></div><p class="sec-desc">Pelajari Krama Inggil melalui cerita interaktif dengan pilihan dialog. Setiap pilihan menentukan jalannya cerita.</p></div>
+        <div id="storySkelWrap"></div>
+        <div class="story-container" id="storyReal" style="display:none">
+            <div class="story-ep-select" id="storyEpSelect"></div>
+            <div class="story-scene glass" id="storyScene"></div>
         </div>
     </section>
     </div>
 
-    <div class="divider"><span class="di">&#9670;</span></div>
+    <div class="divider"><span style="color:var(--g);font-size:0.9rem;vertical-align:middle">&#9670;</span></div>
 
     <!-- KOSAKATA -->
     <section class="sec" id="kosakata">
-        <div class="sec-head">
-            <div class="sec-tag">Perbendaharaan Kata</div>
-            <h2 class="sec-title">Kosakata <span>Krama Inggil</span></h2>
-            <div class="sec-line"></div>
-        </div>
-        <div class="vocab-grid" id="vocabGrid"></div>
+        <div class="sec-head"><div class="sec-tag">Perbendaharaan Kata</div><h2 class="sec-title">Kosakata <span>Krama Inggil</span></h2><div class="sec-line"></div></div>
+        <div id="vocabSkelWrap"></div>
+        <div class="vocab-grid" id="vocabGrid" style="display:none"></div>
     </section>
 
-    <div class="divider"><span class="di">&#9670;</span></div>
+    <div class="divider"><span style="color:var(--g);font-size:0.9rem;vertical-align:middle">&#9670;</span></div>
 
-    <!-- FOOTER -->
     <footer class="footer">
         <div class="footer-inner">
-            <div class="footer-brand">
-                <h3>Sinau Basa Jawa</h3>
-                <p>Platform pembelajaran Bahasa Jawa Krama Inggil interaktif dengan tutor 3D, flashcard cerdas, dan teknologi AR.</p>
-            </div>
-            <div class="footer-col"><h4>Fitur</h4><ul><li><a href="#tutor">Tutor 3D</a></li><li><a href="#flashcard">Flashcard SRS</a></li><li><a href="#ar-kamus">AR Kamus</a></li><li><a href="#kosakata">Kosakata</a></li></ul></div>
-            <div class="footer-col"><h4>Tentang</h4><ul><li><a href="#">Tentang Platform</a></li><li><a href="#">Sumber Referensi</a></li></ul></div>
+            <div class="footer-brand"><h3>Sinau Basa Jawa</h3><p>Platform pembelajaran Bahasa Jawa Krama Inggil dengan tutor 3D, flashcard cerdas, cerita interaktif, dan UI kelas dunia.</p></div>
+            <div class="footer-col"><h4>Fitur</h4><ul><li><a href="#tutor">Tutor 3D</a></li><li><a href="#flashcard">Flashcard</a></li><li><a href="#story">Cerita Interaktif</a></li><li><a href="#kosakata">Kosakata</a></li></ul></div>
         </div>
-        <div class="footer-bottom">
-            <p>Sinau Basa Jawa - Melestarikan Warisan Budaya Leluhur</p>
-            <p>Tutor 3D + Flashcard SRS + AR Kamus</p>
-        </div>
+        <div class="footer-bottom"><p>Sinau Basa Jawa - Melestarikan Warisan Budaya Leluhur Nusantara</p></div>
     </footer>
 </div>
 
 <script>
 /* ===== GLOBALS ===== */
-let userData = JSON.parse(localStorage.getItem('sinauUser') || 'null') || {avatar:1,level:'pemula',goal:10,streak:0,xp:0,lastDate:'',obDone:false};
-function saveUser(){localStorage.setItem('sinauUser',JSON.stringify(userData))}
+let xp=parseInt(localStorage.getItem('sjXP')||'0');
+let streak=parseInt(localStorage.getItem('sjStreak')||'1');
 
-/* ===== CANVAS BG ===== */
+/* ===== CINEMATIC LOADER ===== */
+(function(){
+    const aksaraChars=['HA','NA','CA','RA','KA','DA','TA','SA','WA','LA'];
+    const cont=document.getElementById('cineAksara');
+    aksaraChars.forEach(c=>{const el=document.createElement('span');el.className='cine-char';el.textContent=c;cont.appendChild(el)});
+    // Particles
+    const pc=document.getElementById('cineParticles');
+    for(let i=0;i<30;i++){const p=document.createElement('div');p.style.cssText=`position:absolute;width:${2+Math.random()*4}px;height:${2+Math.random()*4}px;background:rgba(201,168,76,${0.1+Math.random()*0.3});border-radius:50%;left:${Math.random()*100}%;top:${Math.random()*100}%;animation:obFloat ${2+Math.random()*3}s ease-in-out infinite ${Math.random()*2}s`;pc.appendChild(p)}
+
+    const timeline=[
+        [200,()=>document.getElementById('cineLine').classList.add('expand')],
+        [800,()=>{const chars=document.querySelectorAll('.cine-char');chars.forEach((c,i)=>setTimeout(()=>c.classList.add('show'),i*80))}],
+        [2200,()=>{document.querySelectorAll('.cine-char').forEach((c,i)=>setTimeout(()=>c.classList.add('burst'),i*40))}],
+        [2800,()=>document.getElementById('cineLogo').classList.add('show')],
+        [3200,()=>document.getElementById('cineSub').classList.add('show')],
+        [4200,()=>{document.getElementById('cineLoader').classList.add('done');setTimeout(()=>{document.getElementById('cineLoader').style.display='none';initApp()},1000)}],
+    ];
+    timeline.forEach(([t,fn])=>setTimeout(fn,t));
+})();
+
+/* ===== CANVAS BG (time-based) ===== */
 (function(){
     const c=document.getElementById('bgCanvas'),x=c.getContext('2d');let W,H,stars=[];
     function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
     addEventListener('resize',resize);resize();
-    for(let i=0;i<150;i++)stars.push({x:Math.random()*2000-1000,y:Math.random()*2000-1000,z:Math.random()*1200+200,spd:Math.random()*0.5+0.15});
+    for(let i=0;i<140;i++)stars.push({x:Math.random()*2000-1000,y:Math.random()*2000-1000,z:Math.random()*1200+200,spd:Math.random()*0.4+0.1});
+    function getTimeColors(){
+        const h=new Date().getHours();
+        if(h>=5&&h<10)return{bg1:'rgba(60,25,5,0.3)',bg2:'rgba(30,10,0,0.2)',star:0.5};
+        if(h>=10&&h<15)return{bg1:'rgba(40,20,5,0.2)',bg2:'rgba(10,5,0,0.15)',star:0.3};
+        if(h>=15&&h<18)return{bg1:'rgba(50,15,20,0.25)',bg2:'rgba(20,5,10,0.2)',star:0.4};
+        if(h>=18&&h<21)return{bg1:'rgba(15,5,30,0.3)',bg2:'rgba(5,2,15,0.2)',star:0.7};
+        return{bg1:'rgba(5,2,10,0.3)',bg2:'rgba(0,0,5,0.25)',star:0.9};
+    }
     let f=0;
     (function draw(){
         x.clearRect(0,0,W,H);f++;
+        const tc=getTimeColors();
         const g=x.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*0.8);
-        g.addColorStop(0,'rgba(40,18,0,0.2)');g.addColorStop(1,'rgba(0,0,0,0.15)');
+        g.addColorStop(0,tc.bg1);g.addColorStop(1,tc.bg2);
         x.fillStyle=g;x.fillRect(0,0,W,H);
         const cx=W/2,cy=H/2;
         stars.forEach(s=>{s.z-=s.spd;if(s.z<=1){s.x=Math.random()*2000-1000;s.y=Math.random()*2000-1000;s.z=1200}
-            const sc=800/s.z,sx=s.x*sc+cx,sy=s.y*sc+cy,sr=Math.max(0.3,sc*0.7),a=Math.min(0.7,(1200-s.z)/900);
+            const sc=800/s.z,sx=s.x*sc+cx,sy=s.y*sc+cy,sr=Math.max(0.3,sc*0.6);
+            const a=Math.min(tc.star,(1200-s.z)/900);
             if(sx<-5||sx>W+5||sy<-5||sy>H+5)return;
-            x.beginPath();x.arc(sx,sy,sr,0,Math.PI*2);x.fillStyle=`rgba(240,208,128,${a*0.6})`;x.fill();
+            x.beginPath();x.arc(sx,sy,sr,0,Math.PI*2);
+            x.fillStyle=`rgba(240,208,128,${a*0.6})`;x.fill();
         });
-        const pa=(Math.sin(f*0.018)+1)*0.02;
+        const pa=(Math.sin(f*0.015)+1)*0.02;
         const pg=x.createRadialGradient(cx,cy,0,cx,cy,300);
         pg.addColorStop(0,`rgba(201,168,76,${pa})`);pg.addColorStop(1,'transparent');
         x.fillStyle=pg;x.fillRect(0,0,W,H);
@@ -874,399 +452,386 @@ function saveUser(){localStorage.setItem('sinauUser',JSON.stringify(userData))}
     })();
 })();
 
-/* ===== NOTIFICATION ===== */
-let nTimer;
-function notify(m,t){const n=document.getElementById('notif');n.textContent=m;n.className='notif '+t+' show';clearTimeout(nTimer);nTimer=setTimeout(()=>n.classList.remove('show'),3000)}
-
-/* ===== ONBOARDING ===== */
-let obCurrent=0,obAvatar=1,obScore=0,obGoal=10;
-const obTests=[
-    {q:'Apa arti "Sugeng Enjang" dalam Bahasa Indonesia?',opts:['Selamat Malam','Selamat Pagi','Selamat Siang','Selamat Sore'],ans:1},
-    {q:'Kata Krama Inggil untuk "makan" adalah...',opts:['Mangan','Nedha','Dhahar','Maem'],ans:2},
-    {q:'"Panjenengan" dalam Krama Inggil berarti...',opts:['Saya','Mereka','Anda (hormat)','Dia'],ans:2},
-];
-let obTestIdx=0;
-
-// Generate particles
+/* ===== CURSOR ===== */
 (function(){
-    const cont=document.getElementById('obParticles');
-    for(let i=0;i<20;i++){
-        const p=document.createElement('div');p.className='ob-particle';
-        p.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${3+Math.random()*5}px;height:${3+Math.random()*5}px;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*2}s;`;
-        cont.appendChild(p);
-    }
+    if(innerWidth<769)return;
+    const ring=document.getElementById('cursorRing'),dot=document.getElementById('cursorDot');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+    (function anim(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(anim)})();
+    // Magnetic + hover
+    document.addEventListener('mouseover',e=>{
+        const t=e.target.closest('a,button,.vocab-card,.fc-card,.story-choice,.tut-topic');
+        if(t)ring.classList.add('hover');else ring.classList.remove('hover');
+    });
+    // Magnetic effect
+    document.querySelectorAll('.btn-gold,.btn-outline,.tut-topic,.story-choice').forEach(el=>{
+        el.addEventListener('mousemove',e=>{
+            const r=el.getBoundingClientRect();
+            const cx=r.left+r.width/2,cy=r.top+r.height/2;
+            const dx=(e.clientX-cx)*0.15,dy=(e.clientY-cy)*0.15;
+            el.style.transform=`translate(${dx}px,${dy}px)`;
+        });
+        el.addEventListener('mouseleave',()=>{el.style.transform=''});
+    });
 })();
 
-if(userData.obDone){document.getElementById('onboard').style.display='none';document.getElementById('mainApp').style.display='block';initApp();}
-
-function obNext(step){
-    if(step===2)startObTest();
-    const prev=document.getElementById('obStep'+obCurrent);
-    const next=document.getElementById('obStep'+step);
-    if(prev){prev.classList.remove('active');prev.classList.add('left')}
-    if(next){setTimeout(()=>{next.classList.add('active');next.classList.remove('left')},50)}
-    obCurrent=step;
-    document.querySelectorAll('.ob-dot').forEach((d,i)=>{d.classList.remove('active','done');if(i<step)d.classList.add('done');if(i===step)d.classList.add('active')});
-}
-
-function obSkip(){obFinish()}
-
-function pickAvatar(el,id){
-    document.querySelectorAll('.avatar-option').forEach(a=>a.classList.remove('selected'));
-    el.classList.add('selected');obAvatar=id;
-}
-
-function startObTest(){
-    obTestIdx=0;obScore=0;renderObTest();
-}
-
-function renderObTest(){
-    const area=document.getElementById('obTestArea');
-    if(obTestIdx>=obTests.length){
-        let level='pemula';
-        if(obScore>=3)level='mahir';else if(obScore>=2)level='menengah';
-        userData.level=level;
-        document.getElementById('obResultLevel').textContent=level==='pemula'?'Pemula':level==='menengah'?'Menengah':'Mahir';
-        document.getElementById('obResultMsg').textContent=`Level Anda: ${level.charAt(0).toUpperCase()+level.slice(1)}. Ayo mulai perjalanan belajar Bahasa Jawa Krama Inggil!`;
-        obNext(3);return;
+/* ===== SKELETON LOADER ===== */
+function showSkeleton(id,count,type){
+    const wrap=document.getElementById(id);if(!wrap)return;
+    let html='';
+    if(type==='grid'){
+        html='<div class="skel-grid">';
+        for(let i=0;i<count;i++)html+=`<div class="skeleton skel-card skel-item"></div>`;
+        html+='</div>';
+    }else if(type==='tutor'){
+        html=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center">
+            <div class="skeleton" style="border-radius:20px;aspect-ratio:3/4;max-width:350px;margin:0 auto;width:100%"></div>
+            <div><div class="skeleton skel-line w60" style="height:24px;margin-bottom:14px"></div><div class="skeleton skel-line w40" style="height:12px;margin-bottom:20px"></div><div class="skeleton" style="border-radius:18px;height:140px;margin-bottom:16px"></div><div style="display:flex;gap:8px;flex-wrap:wrap"><div class="skeleton" style="width:70px;height:32px;border-radius:50px"></div><div class="skeleton" style="width:90px;height:32px;border-radius:50px"></div><div class="skeleton" style="width:65px;height:32px;border-radius:50px"></div></div></div>
+        </div>`;
+    }else if(type==='story'){
+        html=`<div style="max-width:700px;margin:0 auto"><div style="display:flex;gap:10px;justify-content:center;margin-bottom:24px"><div class="skeleton" style="width:100px;height:38px;border-radius:14px"></div><div class="skeleton" style="width:100px;height:38px;border-radius:14px"></div><div class="skeleton" style="width:100px;height:38px;border-radius:14px"></div></div><div class="skeleton" style="border-radius:24px;height:400px"></div></div>`;
+    }else if(type==='flashcard'){
+        html=`<div style="max-width:400px;margin:0 auto"><div style="display:flex;justify-content:space-between;margin-bottom:20px"><div class="skeleton" style="width:60%;height:5px;border-radius:3px"></div><div style="display:flex;gap:8px"><div class="skeleton" style="width:60px;height:24px;border-radius:8px"></div><div class="skeleton" style="width:60px;height:24px;border-radius:8px"></div></div></div><div class="skeleton" style="border-radius:22px;height:300px"></div></div>`;
     }
-    const t=obTests[obTestIdx];
-    area.innerHTML=`<div class="ob-quiz-counter">Soal ${obTestIdx+1} / ${obTests.length}</div><div class="ob-quiz-q">${t.q}</div><div class="ob-quiz-opts">${t.opts.map((o,i)=>`<button class="ob-quiz-opt" onclick="obAnswer(${i})">${o}</button>`).join('')}</div>`;
+    wrap.innerHTML=html;
 }
 
-function obAnswer(i){
-    const t=obTests[obTestIdx];
-    document.querySelectorAll('.ob-quiz-opt').forEach((b,j)=>{b.disabled=true;if(j===t.ans)b.classList.add('correct');else if(j===i&&i!==t.ans)b.classList.add('wrong')});
-    if(i===t.ans)obScore++;
-    setTimeout(()=>{obTestIdx++;if(obTestIdx<obTests.length)renderObTest();else{
-        let level='pemula';if(obScore>=3)level='mahir';else if(obScore>=2)level='menengah';
-        userData.level=level;
-        document.getElementById('obResultLevel').textContent=level==='pemula'?'Pemula':level==='menengah'?'Menengah':'Mahir';
-        document.getElementById('obResultMsg').textContent=`Level: ${level.charAt(0).toUpperCase()+level.slice(1)}. ${obScore}/${obTests.length} benar. Ayo mulai belajar!`;
-        obNext(4);
-    }},800);
+function hideSkeleton(skelId,realId){
+    const skel=document.getElementById(skelId);
+    const real=document.getElementById(realId);
+    if(skel)skel.style.display='none';
+    if(real)real.style.display='';
 }
 
-function pickGoal(el,mins){
-    document.querySelectorAll('.goal-option').forEach(g=>g.classList.remove('selected'));
-    el.classList.add('selected');obGoal=mins;
+/* ===== NOTIFY ===== */
+let nT;function notify(m,t){const n=document.getElementById('notif');n.textContent=m;n.className='notif '+t+' show';clearTimeout(nT);nT=setTimeout(()=>n.classList.remove('show'),3000)}
+
+/* ===== REVEAL ===== */
+function initReveal(){
+    const obs=new IntersectionObserver(ent=>{ent.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.rv:not(.show)').forEach(el=>obs.observe(el));
 }
 
-function obFinish(){
-    userData.avatar=obAvatar;userData.goal=obGoal;userData.obDone=true;
-    const today=new Date().toDateString();
-    if(userData.lastDate!==today){userData.streak++;userData.lastDate=today}
-    saveUser();
-    document.getElementById('onboard').classList.add('hidden');
-    setTimeout(()=>{document.getElementById('onboard').style.display='none';document.getElementById('mainApp').style.display='block';initApp()},800);
-}
+/* ===== ADD XP ===== */
+function addXP(n){xp+=n;localStorage.setItem('sjXP',xp);document.getElementById('xpN').textContent=xp;notify('+'+n+' XP','success')}
 
-/* ===== INIT APP ===== */
-function initApp(){
-    updateNav();buildVocab();initFlashcards();initReveal();
-    checkStreak();
-    setTimeout(()=>notify('Sugeng rawuh! Selamat belajar!','success'),500);
-}
+/* ===== SPEAK ===== */
+function speak(w,e){if(e&&e.stopPropagation)e.stopPropagation();if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(w);u.lang='id-ID';u.rate=0.8;speechSynthesis.speak(u)}}
 
-function updateNav(){
-    document.getElementById('streakNum').textContent=userData.streak;
-    document.getElementById('xpNum').textContent=userData.xp;
-    const av=document.getElementById('navAv');
-    av.className='nav-av av-char-'+userData.avatar;
-    const names={1:'M',2:'R',3:'A',4:'S'};
-    av.textContent=names[userData.avatar]||'M';
-}
-
-function checkStreak(){
-    const today=new Date().toDateString();
-    if(userData.lastDate!==today){
-        userData.lastDate=today;userData.streak++;saveUser();updateNav();
-    }
-}
-
-function addXP(n){userData.xp+=n;saveUser();updateNav();notify('+'+n+' XP','success')}
+/* ===== WOTD ===== */
+const wotdList=[
+    {w:'Dhahar',m:'Makan (Krama Inggil)'},{w:'Ngunjuk',m:'Minum'},{w:'Sare',m:'Tidur'},{w:'Rawuh',m:'Datang'},{w:'Tindak',m:'Pergi (hormat)'},
+    {w:'Lenggah',m:'Duduk'},{w:'Matur Nuwun',m:'Terima Kasih'},{w:'Sugeng',m:'Selamat'},{w:'Griya',m:'Rumah'},{w:'Kondur',m:'Pulang (hormat)'},
+];
+function setWOTD(){const d=new Date().getDate()%wotdList.length;const w=wotdList[d];document.getElementById('wotdWord').textContent=w.w;document.getElementById('wotdMeaning').textContent=w.m}
 
 /* ===== VOCAB ===== */
 const vocabs=[
-    {jawa:'Dhahar',indo:'Makan',ngoko:'mangan',cat:'Kegiatan',ex:'Panjenengan sampun dhahar? - Anda sudah makan?'},
-    {jawa:'Ngunjuk',indo:'Minum',ngoko:'ngombe',cat:'Kegiatan',ex:'Mangga ngunjuk rumiyin. - Silakan minum dulu.'},
-    {jawa:'Sare',indo:'Tidur',ngoko:'turu',cat:'Kegiatan',ex:'Bapak sampun sare. - Bapak sudah tidur.'},
-    {jawa:'Tindak',indo:'Pergi (hormat)',ngoko:'lunga',cat:'Gerakan',ex:'Panjenengan badhe tindak pundi? - Anda mau pergi ke mana?'},
-    {jawa:'Rawuh',indo:'Datang',ngoko:'teka',cat:'Gerakan',ex:'Sugeng rawuh! - Selamat datang!'},
-    {jawa:'Lenggah',indo:'Duduk',ngoko:'lungguh',cat:'Gerakan',ex:'Mangga lenggah rumiyin. - Silakan duduk dulu.'},
-    {jawa:'Ngendika',indo:'Berkata',ngoko:'ngomong',cat:'Komunikasi',ex:'Bapak ngendika menapa? - Bapak berkata apa?'},
-    {jawa:'Mangertos',indo:'Mengerti',ngoko:'ngerti',cat:'Pikiran',ex:'Kula sampun mangertos. - Saya sudah mengerti.'},
-    {jawa:'Kula',indo:'Saya',ngoko:'aku',cat:'Kata Ganti',ex:'Kula nyuwun pangapunten. - Saya minta maaf.'},
-    {jawa:'Panjenengan',indo:'Anda (hormat)',ngoko:'kowe',cat:'Kata Ganti',ex:'Panjenengan saking pundi? - Anda dari mana?'},
-    {jawa:'Matur Nuwun',indo:'Terima Kasih',ngoko:'matur suwun',cat:'Ungkapan',ex:'Matur nuwun sanget, Bapak. - Terima kasih banyak.'},
-    {jawa:'Nyuwun Pangapunten',indo:'Minta Maaf',ngoko:'njaluk ngapura',cat:'Ungkapan',ex:'Nyuwun pangapunten, kula telat. - Maaf, saya terlambat.'},
-    {jawa:'Griya',indo:'Rumah',ngoko:'omah',cat:'Tempat',ex:'Griya panjenengan wonten pundi? - Rumah Anda di mana?'},
-    {jawa:'Sugeng',indo:'Selamat',ngoko:'slamet',cat:'Ungkapan',ex:'Sugeng enjang! - Selamat pagi!'},
-    {jawa:'Badhe',indo:'Akan / Mau',ngoko:'arep',cat:'Kata Bantu',ex:'Kula badhe sinau. - Saya akan belajar.'},
-    {jawa:'Sampun',indo:'Sudah',ngoko:'wis',cat:'Kata Bantu',ex:'Sampun, matur nuwun. - Sudah, terima kasih.'},
-    {jawa:'Dereng',indo:'Belum',ngoko:'durung',cat:'Kata Bantu',ex:'Dereng, mangke kemawon. - Belum, nanti saja.'},
-    {jawa:'Kondur',indo:'Pulang (hormat)',ngoko:'mulih',cat:'Gerakan',ex:'Panjenengan sampun kondur? - Anda sudah pulang?'},
-    {jawa:'Sowan',indo:'Berkunjung',ngoko:'mertamu',cat:'Kegiatan',ex:'Kula badhe sowan dateng griya. - Saya mau berkunjung.'},
-    {jawa:'Sekul',indo:'Nasi',ngoko:'sego',cat:'Makanan',ex:'Sekul kaliyan ulam. - Nasi dengan lauk.'},
+    {jawa:'Dhahar',indo:'Makan',ngoko:'mangan',cat:'Kegiatan',ex:'Panjenengan sampun dhahar?'},
+    {jawa:'Ngunjuk',indo:'Minum',ngoko:'ngombe',cat:'Kegiatan',ex:'Mangga ngunjuk rumiyin.'},
+    {jawa:'Sare',indo:'Tidur',ngoko:'turu',cat:'Kegiatan',ex:'Bapak sampun sare.'},
+    {jawa:'Tindak',indo:'Pergi (hormat)',ngoko:'lunga',cat:'Gerakan',ex:'Badhe tindak pundi?'},
+    {jawa:'Rawuh',indo:'Datang',ngoko:'teka',cat:'Gerakan',ex:'Sugeng rawuh!'},
+    {jawa:'Lenggah',indo:'Duduk',ngoko:'lungguh',cat:'Gerakan',ex:'Mangga lenggah.'},
+    {jawa:'Ngendika',indo:'Berkata',ngoko:'ngomong',cat:'Komunikasi',ex:'Bapak ngendika menapa?'},
+    {jawa:'Mangertos',indo:'Mengerti',ngoko:'ngerti',cat:'Pikiran',ex:'Kula sampun mangertos.'},
+    {jawa:'Kula',indo:'Saya',ngoko:'aku',cat:'Kata Ganti',ex:'Kula nyuwun pangapunten.'},
+    {jawa:'Panjenengan',indo:'Anda (hormat)',ngoko:'kowe',cat:'Kata Ganti',ex:'Panjenengan saking pundi?'},
+    {jawa:'Matur Nuwun',indo:'Terima Kasih',ngoko:'matur suwun',cat:'Ungkapan',ex:'Matur nuwun sanget.'},
+    {jawa:'Griya',indo:'Rumah',ngoko:'omah',cat:'Tempat',ex:'Griya kula tebih.'},
+    {jawa:'Sugeng',indo:'Selamat',ngoko:'slamet',cat:'Ungkapan',ex:'Sugeng enjang!'},
+    {jawa:'Badhe',indo:'Akan/Mau',ngoko:'arep',cat:'Kata Bantu',ex:'Kula badhe sinau.'},
+    {jawa:'Sampun',indo:'Sudah',ngoko:'wis',cat:'Kata Bantu',ex:'Sampun, matur nuwun.'},
+    {jawa:'Kondur',indo:'Pulang (hormat)',ngoko:'mulih',cat:'Gerakan',ex:'Bapak sampun kondur.'},
+    {jawa:'Sowan',indo:'Berkunjung',ngoko:'mertamu',cat:'Kegiatan',ex:'Kula badhe sowan.'},
+    {jawa:'Sekul',indo:'Nasi',ngoko:'sego',cat:'Makanan',ex:'Sekul kaliyan ulam.'},
 ];
 
 function buildVocab(){
     const g=document.getElementById('vocabGrid');g.innerHTML='';
     vocabs.forEach((v,i)=>{
         const el=document.createElement('div');
-        el.className=`vocab-card rv${i%3>0?' d'+(i%3):''}`;
+        el.className=`vocab-card glass rv${i%3>0?' d'+(i%3):''}`;
         el.innerHTML=`<div class="vc-cat">${v.cat}</div><div class="vc-jawa">${v.jawa}</div><div class="vc-indo">${v.indo}</div><div class="vc-ngoko">Ngoko: <span>${v.ngoko}</span></div><button class="speak-btn" onclick="speak('${v.jawa}',event)"><span class="play-tri"></span> Dengarkan</button><div class="vc-num">${String(i+1).padStart(2,'0')}</div>`;
         g.appendChild(el);
     });
 }
 
-/* ===== 3D TUTOR ===== */
+/* ===== TUTOR ===== */
 const tutorTopics={
-    sapaan:'Sugeng rawuh! Sapaan dalam Krama Inggil:\n\nSugeng enjang = Selamat pagi\nSugeng siyang = Selamat siang\nSugeng sonten = Selamat sore\nSugeng dalu = Selamat malam\nSugeng rawuh = Selamat datang\n\nContoh: "Sugeng enjang, Bapak. Kadospundi kabaripun?"',
-    makan:'Bab dhahar (makan) lan ngunjuk (minum):\n\nDhahar = Makan (Krama Inggil)\nNgunjuk = Minum (Krama Inggil)\nSekul = Nasi\nUlam = Lauk\nToya = Air\n\nContoh: "Mangga dhahar rumiyin, Bapak." - Silakan makan dulu, Bapak.',
-    keluarga:'Bab kulawarga (keluarga):\n\nRama = Ayah (hormat)\nIbu = Ibu\nPutra = Anak laki-laki\nPutri = Anak perempuan\nGarwa = Istri/suami (hormat)\nMbah = Kakek/nenek\n\nContoh: "Rama kula sampun kondur." - Ayah saya sudah pulang.',
-    angka:'Bab angka (wilangan):\n\nSetunggal = 1 (siji)\nKalih = 2 (loro)\nTiga = 3 (telu)\nSekawan = 4 (papat)\nGangsal = 5 (lima)\nSedasa = 10 (sepuluh)\n\nContoh: "Kula gadhah putra kalih." - Saya punya anak dua.',
-    waktu:'Bab wekdal (waktu):\n\nEnjang = Pagi\nSiyang = Siang\nSonten = Sore\nDalu = Malam\nSamenika = Sekarang\nMangke = Nanti\nBenjing = Besok\n\nContoh: "Mangke sonten kula badhe sowan." - Nanti sore saya akan berkunjung.',
-    pasar:'Bab pasar (belanja):\n\nMundhut = Membeli (hormat)\nTumbas = Membeli\nRegine pinten? = Berapa harganya?\nAwis = Mahal\nMirah = Murah\nAtur = Membayar\n\nContoh: "Kula badhe mundhut rasukan." - Saya mau membeli baju.',
+    sapaan:'Sugeng rawuh! Sapaan dalam Krama Inggil:\n\nSugeng enjang = Selamat pagi\nSugeng siyang = Selamat siang\nSugeng sonten = Selamat sore\nSugeng dalu = Selamat malam\n\nContoh: "Sugeng enjang, Bapak. Kadospundi kabaripun?"',
+    makan:'Bab dhahar lan ngunjuk:\n\nDhahar = Makan (Krama Inggil)\nNgunjuk = Minum\nSekul = Nasi\nUlam = Lauk\nToya = Air\n\nContoh: "Mangga dhahar rumiyin, Bapak."',
+    keluarga:'Bab kulawarga:\n\nRama = Ayah (hormat)\nIbu = Ibu\nPutra = Anak laki-laki\nPutri = Anak perempuan\nGarwa = Istri/suami (hormat)\n\nContoh: "Rama kula sampun kondur."',
+    angka:'Bab wilangan:\n\nSetunggal = 1\nKalih = 2\nTiga = 3\nSekawan = 4\nGangsal = 5\nSedasa = 10\n\nContoh: "Kula gadhah putra kalih."',
+    waktu:'Bab wekdal:\n\nEnjang = Pagi\nSiyang = Siang\nSonten = Sore\nDalu = Malam\nSamenika = Sekarang\nMangke = Nanti\n\nContoh: "Mangke sonten kula badhe sowan."',
+    pasar:'Bab pasar:\n\nMundhut = Membeli (hormat)\nRegine pinten? = Berapa harganya?\nAwis = Mahal\nMirah = Murah\n\nContoh: "Kula badhe mundhut rasukan."',
 };
-
-function tutorTalk(topic){
-    const speech=document.getElementById('tutorSpeech');
-    const mouth=document.getElementById('tutorMouth');
-    const text=tutorTopics[topic]||'Pilih topik kangge sinau.';
-    speech.innerHTML=text.replace(/\n/g,'<br>');
-    mouth.classList.add('talking');
-    addXP(5);
-    if('speechSynthesis' in window){
-        speechSynthesis.cancel();
-        const firstLine=text.split('\n')[0];
-        const u=new SpeechSynthesisUtterance(firstLine);
-        u.lang='id-ID';u.rate=0.8;
-        u.onend=()=>mouth.classList.remove('talking');
-        speechSynthesis.speak(u);
-    } else {setTimeout(()=>mouth.classList.remove('talking'),2000)}
+function tutorTalk(t){
+    const sp=document.getElementById('tutSpeech'),mo=document.getElementById('tutMouth');
+    const txt=tutorTopics[t]||'Pilih topik kangge sinau.';
+    sp.innerHTML=txt.replace(/\n/g,'<br>');mo.classList.add('talking');addXP(5);
+    if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt.split('\n')[0]);u.lang='id-ID';u.rate=0.8;u.onend=()=>mo.classList.remove('talking');speechSynthesis.speak(u)}
+    else setTimeout(()=>mo.classList.remove('talking'),2000);
 }
 
-/* ===== FLASHCARD SRS ===== */
-let fcDeck=[],fcIdx=0,fcFlipped=false,fcOkCount=0,fcNoCount=0;
-
-function initFlashcards(){
-    fcDeck=vocabs.map((v,i)=>({...v,idx:i,ease:2.5,interval:1,reps:0}));
-    shuffle(fcDeck);
-    fcIdx=0;fcFlipped=false;fcOkCount=0;fcNoCount=0;
-    renderFlashcard();
+/* ===== FLASHCARD ===== */
+let fcDeck=[],fcIdx=0,fcFlip=false,fcOkC=0,fcNoC=0;
+function initFC(){
+    fcDeck=vocabs.map((v,i)=>({...v,idx:i}));shuffle(fcDeck);
+    fcIdx=0;fcFlip=false;fcOkC=0;fcNoC=0;renderFC();
 }
-
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}}
+function renderFC(){
+    const st=document.getElementById('fcStage'),act=document.getElementById('fcAct');
+    if(fcIdx>=fcDeck.length){renderFCDone();return}
+    const c=fcDeck[fcIdx];
+    document.getElementById('fcPF').style.width=(fcIdx/fcDeck.length*100)+'%';
+    document.getElementById('fcPT').textContent=`Kartu ${fcIdx+1}/${fcDeck.length}`;
+    document.getElementById('fcOk').textContent='Hafal: '+fcOkC;
+    document.getElementById('fcNo').textContent='Lupa: '+fcNoC;
+    st.innerHTML=`<div class="fc-card glass" id="fcCard" onclick="flipFC()"><div class="fc-face"><div class="fc-cat">${c.cat}</div><div class="fc-word">${c.jawa}</div><div class="fc-hint">Apa artinya?</div><div class="fc-flip">Klik untuk jawaban</div></div><div class="fc-face fc-back"><div class="fc-cat">${c.cat}</div><div class="fc-meaning">${c.indo}</div><div class="fc-ngk">Ngoko: ${c.ngoko}</div><div class="fc-ex">${c.ex||''}</div></div></div>`;
+    act.style.display='none';fcFlip=false;
+    const el=document.getElementById('fcCard');
+    let sx=0;
+    el.addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});
+    el.addEventListener('touchend',e=>{const d=e.changedTouches[0].clientX-sx;if(Math.abs(d)>60&&fcFlip){d>0?fcRate('ok'):fcRate('hard')}},{passive:true});
+}
+function flipFC(){const c=document.getElementById('fcCard');if(!c)return;c.classList.toggle('flipped');fcFlip=!fcFlip;if(fcFlip)document.getElementById('fcAct').style.display='flex'}
+function fcRate(r){
+    const el=document.getElementById('fcCard');
+    if(r==='ok'||r==='easy'){fcOkC++;if(el)el.classList.add('sr');addXP(r==='easy'?15:10)}
+    else{fcNoC++;if(el)el.classList.add('sl');fcDeck.push({...fcDeck[fcIdx]})}
+    setTimeout(()=>{fcIdx++;renderFC()},350);
+}
+function renderFCDone(){
+    document.getElementById('fcStage').innerHTML=`<div class="fc-done"><div class="fc-done-t">Sesi Selesai!</div><div class="fc-done-stats"><div class="fc-ds fc-ds-ok"><span class="fc-ds-n">${fcOkC}</span><span class="fc-ds-l">Hafal</span></div><div class="fc-ds fc-ds-no"><span class="fc-ds-n">${fcNoC}</span><span class="fc-ds-l">Ulangi</span></div></div><button class="btn-gold" onclick="initFC()">Ulangi Sesi</button></div>`;
+    document.getElementById('fcAct').style.display='none';document.getElementById('fcPF').style.width='100%';confetti();
+}
+function confetti(){for(let i=0;i<20;i++){setTimeout(()=>{const p=document.createElement('div');p.style.cssText=`position:fixed;left:${Math.random()*100}vw;bottom:-10px;width:${4+Math.random()*6}px;height:${4+Math.random()*6}px;background:${Math.random()>.5?'#c9a84c':'#f0d080'};border-radius:50%;pointer-events:none;z-index:9998;animation:confUp ${2+Math.random()*1.5}s ease forwards;`;document.body.appendChild(p);setTimeout(()=>p.remove(),3500)},i*70)}}
 
-function renderFlashcard(){
-    const stage=document.getElementById('fcStage');
-    const actions=document.getElementById('fcActions');
-    if(fcIdx>=fcDeck.length){renderFcComplete();return}
-    const card=fcDeck[fcIdx];
-    const pct=((fcIdx)/fcDeck.length)*100;
-    document.getElementById('fcProgFill').style.width=pct+'%';
-    document.getElementById('fcProgText').textContent=`Kartu ${fcIdx+1} / ${fcDeck.length}`;
-    document.getElementById('fcOk').textContent='Hafal: '+fcOkCount;
-    document.getElementById('fcNo').textContent='Lupa: '+fcNoCount;
+/* ===== STORY MODE ===== */
+const storyData=[
+    {
+        id:1,title:'Sugeng Enjang',desc:'Pagi hari, kamu bertemu tetangga di depan rumah.',
+        scenes:[
+            {narrator:'Pagi hari yang cerah. Kamu berjalan keluar rumah dan bertemu Bapak Hardi, tetangga yang dihormati.',speaker:'Bapak Hardi',dialog:'Sugeng enjang! Kadospundi kabaripun, nak?',
+                choices:[
+                    {text:'Sugeng enjang, Bapak. Sae, matur nuwun.',correct:true,fb:'Betul! "Sugeng enjang" = selamat pagi. "Sae" = baik. "Matur nuwun" = terima kasih.'},
+                    {text:'Selamat pagi, Pak. Baik, terima kasih.',correct:false,fb:'Hampir benar, tapi jawablah dalam Krama Inggil saat berbicara dengan yang lebih tua.'},
+                    {text:'Sugeng dalu, Bapak. Kula sae.',correct:false,fb:'"Sugeng dalu" berarti selamat malam, bukan pagi. Gunakan "Sugeng enjang" di pagi hari.'},
+                ]
+            },
+            {narrator:'Bapak Hardi tersenyum senang mendengar jawabanmu dalam Krama Inggil yang baik.',speaker:'Bapak Hardi',dialog:'Wah, sae sanget. Panjenengan badhe tindak pundi enjang menika?',
+                choices:[
+                    {text:'Kula badhe tindak sekolahan, Bapak.',correct:true,fb:'Sempurna! "Kula" = saya, "badhe" = akan, "tindak" = pergi (hormat).'},
+                    {text:'Aku arep lunga sekolah, Pak.',correct:false,fb:'Ini bahasa Ngoko (kasar). Kepada orang tua, gunakan Krama Inggil: "Kula badhe tindak sekolahan."'},
+                    {text:'Kula badhe dhahar, Bapak.',correct:false,fb:'"Dhahar" berarti makan. Jika mau ke sekolah, gunakan "tindak sekolahan."'},
+                ]
+            },
+            {narrator:'Bapak Hardi mengangguk dan memberikan pesan perpisahan.',speaker:'Bapak Hardi',dialog:'Inggih, ngatos-atos ing margi nggih, nak. Sugeng tindak!',
+                choices:[
+                    {text:'Inggih, matur nuwun, Bapak. Sugeng enjang!',correct:true,fb:'Bagus! "Inggih" = iya, "matur nuwun" = terima kasih. Jawabanmu sopan dan tepat!'},
+                    {text:'Oke Pak, dadah!',correct:false,fb:'Terlalu kasual! Kepada orang tua, jawab dengan sopan: "Inggih, matur nuwun, Bapak."'},
+                    {text:'Nyuwun pangapunten, Bapak. Kula badhe kondur.',correct:false,fb:'"Kondur" berarti pulang, bukan berangkat. Yang tepat: "Matur nuwun, Bapak."'},
+                ]
+            },
+        ]
+    },
+    {
+        id:2,title:'Ing Pasar',desc:'Kamu pergi ke pasar untuk membeli sayuran.',
+        scenes:[
+            {narrator:'Kamu tiba di pasar tradisional. Seorang ibu penjual sayur menyapamu.',speaker:'Ibu Penjual',dialog:'Mangga, nak. Badhe mundhut menapa?',
+                choices:[
+                    {text:'Kula badhe mundhut sayuran, Ibu. Regine pinten?',correct:true,fb:'Benar! "Mundhut" = membeli (hormat). "Regine pinten" = berapa harganya. Sopan dan tepat!'},
+                    {text:'Aku mau beli sayur. Berapa harganya?',correct:false,fb:'Gunakan Krama Inggil di pasar untuk menunjukkan sopan santun: "Kula badhe mundhut sayuran."'},
+                    {text:'Boten, matur nuwun.',correct:false,fb:'"Boten" berarti tidak. Kamu kan mau beli sayuran! Jawab: "Kula badhe mundhut sayuran."'},
+                ]
+            },
+            {narrator:'Ibu penjual menunjukkan sayurannya yang segar.',speaker:'Ibu Penjual',dialog:'Sedasa ewu setunggal ikat, nak. Seger-seger sedaya.',
+                choices:[
+                    {text:'Inggih, kula mundhut kalih ikat, Ibu.',correct:true,fb:'Bagus! "Kalih" = dua. "Mundhut" = membeli. Kamu sudah menguasai angka!'},
+                    {text:'Awis sanget, Ibu! Saged kirang?',correct:false,fb:'"Awis" = mahal. Menawar boleh, tapi soal ini tentang membeli. Jawab: "Kula mundhut kalih ikat."'},
+                    {text:'Kula boten mangertos, Ibu.',correct:false,fb:'"Boten mangertos" = tidak mengerti. Ini bukan jawaban yang tepat untuk transaksi jual beli.'},
+                ]
+            },
+        ]
+    },
+    {
+        id:3,title:'Sowan Simbah',desc:'Kamu mengunjungi rumah nenek untuk bersilaturahmi.',
+        scenes:[
+            {narrator:'Kamu tiba di rumah nenek. Simbah sudah duduk di teras dengan senyuman hangat.',speaker:'Simbah',dialog:'Wah, putu kula rawuh! Mangga lenggah rumiyin, nak.',
+                choices:[
+                    {text:'Matur nuwun, Simbah. Kadospundi kabaripun Simbah?',correct:true,fb:'Indah sekali! Menanyakan kabar Simbah dengan Krama Inggil menunjukkan rasa hormat yang tinggi.'},
+                    {text:'Makasih, Mbah. Sehat?',correct:false,fb:'Terlalu kasual untuk berbicara dengan Simbah. Gunakan: "Matur nuwun, Simbah."'},
+                    {text:'Kula dereng dhahar, Simbah.',correct:false,fb:'"Dereng dhahar" = belum makan. Sapalah Simbah dulu: "Matur nuwun, kadospundi kabaripun?"'},
+                ]
+            },
+            {narrator:'Simbah sangat senang melihat cucunya sopan.',speaker:'Simbah',dialog:'Alhamdulillah sae, nak. Panjenengan sampun dhahar dereng?',
+                choices:[
+                    {text:'Dereng, Simbah. Nanging kula boten repot.',correct:true,fb:'Sempurna! "Dereng" = belum. "Boten repot" = tidak merepotkan. Sangat sopan!'},
+                    {text:'Wis, Mbah. Aku wis mangan.',correct:false,fb:'Ini Ngoko! Kepada Simbah: "Sampun, Simbah. Kula sampun dhahar."'},
+                    {text:'Badhe dhahar mangke, Simbah.',correct:false,fb:'Boleh juga, tapi pertanyaannya sudah makan atau belum. Jawab: "Dereng" atau "Sampun."'},
+                ]
+            },
+        ]
+    },
+];
 
-    stage.innerHTML=`
-        <div class="fc-card" id="fcCard" onclick="flipCard()">
-            <div class="fc-face fc-front">
-                <div class="fc-cat">${card.cat}</div>
-                <div class="fc-word">${card.jawa}</div>
-                <div class="fc-hint">Apa artinya?</div>
-                <div class="fc-flip-hint">Klik untuk melihat jawaban</div>
+let storyEp=0,storyScene=0,storyAnswered=false;
+
+function initStory(){
+    renderEpSelect();
+    renderStoryScene();
+}
+
+function renderEpSelect(){
+    const sel=document.getElementById('storyEpSelect');sel.innerHTML='';
+    storyData.forEach((ep,i)=>{
+        const btn=document.createElement('button');
+        btn.className=`story-ep-btn${i===storyEp?' active':''}`;
+        btn.textContent=`Ep. ${ep.id}: ${ep.title}`;
+        btn.onclick=()=>{storyEp=i;storyScene=0;storyAnswered=false;renderEpSelect();renderStoryScene()};
+        sel.appendChild(btn);
+    });
+}
+
+function renderStoryScene(){
+    const container=document.getElementById('storyScene');
+    const ep=storyData[storyEp];
+    if(!ep){container.innerHTML='<div style="padding:40px;text-align:center;color:rgba(245,230,200,0.4)">Episode tidak ditemukan.</div>';return}
+    if(storyScene>=ep.scenes.length){renderStoryComplete(container,ep);return}
+    const sc=ep.scenes[storyScene];
+    storyAnswered=false;
+
+    // Dots
+    let dots='';
+    ep.scenes.forEach((_,i)=>{
+        dots+=`<div class="story-dot${i===storyScene?' active':i<storyScene?' done':''}"></div>`;
+    });
+
+    container.innerHTML=`
+        <div class="story-bg" style="background:linear-gradient(135deg,rgba(45,21,0,0.9),rgba(13,5,0,0.95))"></div>
+        <div class="story-overlay"></div>
+        <div class="story-content">
+            <div class="story-ep-tag">Episode ${ep.id} - ${ep.title}</div>
+            <div class="story-narrator">${sc.narrator}</div>
+            <div class="story-dialog-wrap">
+                <div class="story-speaker">${sc.speaker}</div>
+                <div class="story-dialog-text" id="storyDialogText"></div>
             </div>
-            <div class="fc-face fc-back">
-                <div class="fc-cat">${card.cat}</div>
-                <div class="fc-meaning">${card.indo}</div>
-                <div class="fc-ngoko-text">Ngoko: ${card.ngoko}</div>
-                <div class="fc-example">${card.ex||''}</div>
+            <div class="story-choices" id="storyChoices">
+                ${sc.choices.map((c,i)=>`<button class="story-choice" onclick="storyAnswer(${i})" id="sch${i}"><span class="story-choice-letter">${String.fromCharCode(65+i)}</span>${c.text}</button>`).join('')}
+            </div>
+            <div class="story-feedback" id="storyFb"></div>
+            <div class="story-nav">
+                <div class="story-progress">${dots}</div>
+                <button class="story-next-btn" id="storyNextBtn" onclick="storyNext()">Lanjut</button>
             </div>
         </div>
     `;
-    actions.style.display='none';
-    fcFlipped=false;
 
-    // Touch/swipe
-    let startX=0;
-    const el=document.getElementById('fcCard');
-    el.addEventListener('touchstart',e=>{startX=e.touches[0].clientX},{passive:true});
-    el.addEventListener('touchend',e=>{
-        const diff=e.changedTouches[0].clientX-startX;
-        if(Math.abs(diff)>60&&fcFlipped){
-            if(diff>0)fcRate('ok');else fcRate('hard');
-        }
-    },{passive:true});
+    // Typewriter effect
+    typeWriter(document.getElementById('storyDialogText'),sc.dialog,30);
 }
 
-function flipCard(){
-    const card=document.getElementById('fcCard');
-    if(!card)return;
-    card.classList.toggle('flipped');
-    fcFlipped=!fcFlipped;
-    if(fcFlipped)document.getElementById('fcActions').style.display='flex';
-}
-
-function fcRate(rating){
-    const card=fcDeck[fcIdx];
-    const el=document.getElementById('fcCard');
-    if(rating==='ok'||rating==='easy'){
-        fcOkCount++;
-        if(el)el.classList.add('swipe-right');
-        addXP(rating==='easy'?15:10);
-    } else {
-        fcNoCount++;
-        if(el)el.classList.add('swipe-left');
-        // SRS: put hard cards back later
-        fcDeck.push({...card,reps:0});
+function typeWriter(el,text,speed){
+    el.innerHTML='';let i=0;
+    const cursor=document.createElement('span');cursor.className='story-typing-cursor';
+    function type(){
+        if(i<text.length){el.textContent+=text.charAt(i);el.appendChild(cursor);i++;setTimeout(type,speed)}
+        else{cursor.remove()}
     }
-    setTimeout(()=>{fcIdx++;renderFlashcard()},400);
+    type();
 }
 
-function renderFcComplete(){
-    const stage=document.getElementById('fcStage');
-    document.getElementById('fcActions').style.display='none';
-    const total=fcOkCount+fcNoCount;
-    stage.innerHTML=`
-        <div class="fc-complete">
-            <div class="fc-complete-title">Sesi Selesai!</div>
-            <div class="fc-complete-stats">
-                <div class="fc-cs fc-cs-ok"><span class="fc-cs-num">${fcOkCount}</span><span class="fc-cs-lbl">Hafal</span></div>
-                <div class="fc-cs fc-cs-no"><span class="fc-cs-num">${fcNoCount}</span><span class="fc-cs-lbl">Perlu Diulang</span></div>
-            </div>
-            <button class="ob-btn" onclick="initFlashcards()">Ulangi Sesi</button>
+function storyAnswer(idx){
+    if(storyAnswered)return;storyAnswered=true;
+    const ep=storyData[storyEp],sc=ep.scenes[storyScene];
+    const fb=document.getElementById('storyFb');
+    sc.choices.forEach((_,i)=>{
+        const btn=document.getElementById('sch'+i);
+        btn.disabled=true;
+        if(i===idx){btn.classList.add(sc.choices[i].correct?'correct':'wrong')}
+        if(sc.choices[i].correct&&i!==idx){btn.classList.add('correct')}
+    });
+    const choice=sc.choices[idx];
+    fb.className='story-feedback '+(choice.correct?'ok':'no')+' show';
+    fb.textContent=choice.fb;
+    if(choice.correct)addXP(15);
+    document.getElementById('storyNextBtn').classList.add('visible');
+}
+
+function storyNext(){
+    storyScene++;storyAnswered=false;
+    renderStoryScene();
+}
+
+function renderStoryComplete(container,ep){
+    container.innerHTML=`
+        <div class="story-bg" style="background:linear-gradient(135deg,rgba(45,21,0,0.9),rgba(13,5,0,0.95))"></div>
+        <div class="story-overlay"></div>
+        <div class="story-content" style="justify-content:center;align-items:center;text-align:center">
+            <div class="story-ep-tag">Episode Selesai</div>
+            <div style="font-size:1.6rem;color:var(--gl);margin-bottom:10px">${ep.title}</div>
+            <div style="color:rgba(245,230,200,0.5);font-size:0.9rem;margin-bottom:24px;line-height:1.6">Sae sanget! Anda telah menyelesaikan episode ini. Kemampuan Krama Inggil Anda semakin berkembang.</div>
+            <button class="btn-gold" onclick="storyScene=0;storyAnswered=false;renderStoryScene()">Ulangi Episode</button>
         </div>
     `;
-    document.getElementById('fcProgFill').style.width='100%';
     confetti();
 }
 
-function confetti(){for(let i=0;i<20;i++){setTimeout(()=>{const p=document.createElement('div');p.style.cssText=`position:fixed;left:${Math.random()*100}vw;bottom:-10px;width:${4+Math.random()*6}px;height:${4+Math.random()*6}px;background:${Math.random()>.5?'#c9a84c':'#f0d080'};border-radius:50%;pointer-events:none;z-index:9998;animation:confUp ${2+Math.random()*1.5}s ease forwards;`;document.body.appendChild(p);setTimeout(()=>p.remove(),3500)},i*70)}}
-
-/* ===== AR KAMUS ===== */
-let arStream=null,arActive=false,arSimInterval=null;
-const arObjects=[
-    {obj:'Meja',jawa:'Meja',krama:'Meja',indo:'Meja / Table'},
-    {obj:'Kursi',jawa:'Kursi',krama:'Kursi',indo:'Kursi / Chair'},
-    {obj:'Buku',jawa:'Buku',krama:'Buku',indo:'Buku / Book'},
-    {obj:'Tangan',jawa:'Asta',krama:'Asta',indo:'Tangan / Hand'},
-    {obj:'Kepala',jawa:'Mustaka',krama:'Mustaka',indo:'Kepala / Head'},
-    {obj:'Air',jawa:'Toya',krama:'Toya',indo:'Air / Water'},
-    {obj:'Nasi',jawa:'Sekul',krama:'Sekul',indo:'Nasi / Rice'},
-    {obj:'Baju',jawa:'Rasukan',krama:'Rasukan',indo:'Baju / Clothes'},
-    {obj:'Rumah',jawa:'Griya',krama:'Griya',indo:'Rumah / House'},
-    {obj:'Pintu',jawa:'Konten',krama:'Konten',indo:'Pintu / Door'},
-    {obj:'Jendela',jawa:'Cendhela',krama:'Cendhela',indo:'Jendela / Window'},
-    {obj:'Lampu',jawa:'Lampu',krama:'Lampu',indo:'Lampu / Light'},
-    {obj:'Buah',jawa:'Woh',krama:'Woh-wohan',indo:'Buah / Fruit'},
-    {obj:'Kaki',jawa:'Suku',krama:'Suku',indo:'Kaki / Foot'},
-    {obj:'Mata',jawa:'Paningal',krama:'Paningal',indo:'Mata / Eye'},
-    {obj:'Mulut',jawa:'Tutuk',krama:'Tutuk',indo:'Mulut / Mouth'},
-    {obj:'Hujan',jawa:'Jawah',krama:'Jawah',indo:'Hujan / Rain'},
-    {obj:'Matahari',jawa:'Surya',krama:'Surya',indo:'Matahari / Sun'},
-    {obj:'Bulan',jawa:'Wulan',krama:'Wulan',indo:'Bulan / Moon'},
-    {obj:'Makanan',jawa:'Dhaharan',krama:'Dhaharan',indo:'Makanan / Food'},
-];
-
-async function arStart(){
-    try{
-        arStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
-        document.getElementById('arVideo').srcObject=arStream;
-        document.getElementById('arPermMsg').style.display='none';
-        document.getElementById('arStartBtn').style.display='none';
-        document.getElementById('arStopBtn').style.display='inline-block';
-        document.getElementById('arStatus').textContent='Kamera aktif - Mendeteksi objek...';
-        arActive=true;
-        arAutoDetect();
-        notify('Kamera AR aktif','success');
-    }catch(e){
-        notify('Tidak dapat mengakses kamera: '+e.message,'error');
-        document.getElementById('arStatus').textContent='Gagal mengakses kamera. Gunakan Mode Demo.';
-    }
-}
-
-function arStop(){
-    if(arStream){arStream.getTracks().forEach(t=>t.stop());arStream=null}
-    arActive=false;
-    clearInterval(arSimInterval);
-    document.getElementById('arVideo').srcObject=null;
-    document.getElementById('arPermMsg').style.display='block';
-    document.getElementById('arStartBtn').style.display='inline-block';
-    document.getElementById('arStopBtn').style.display='none';
-    document.getElementById('arOverlay').innerHTML=`<div class="ar-corners"><div class="ar-corner ar-corner-tl"></div><div class="ar-corner ar-corner-tr"></div><div class="ar-corner ar-corner-bl"></div><div class="ar-corner ar-corner-br"></div></div><div class="ar-scan-line"></div>`;
-    document.getElementById('arStatus').textContent='Kamera dimatikan';
-    document.getElementById('arDetected').innerHTML='';
-}
-
-function arAutoDetect(){
-    let detectIdx=0;
-    arSimInterval=setInterval(()=>{
-        if(!arActive)return;
-        const shuffled=[...arObjects].sort(()=>Math.random()-0.5);
-        const obj=shuffled[detectIdx%shuffled.length];
-        detectIdx++;
-        arShowLabel(obj);
-    },3000);
-}
-
-function arSimulate(){
-    document.getElementById('arPermMsg').innerHTML='<div class="ar-perm-title">Mode Demo Aktif</div><p class="ar-perm-desc">Menampilkan simulasi deteksi objek. Pada perangkat nyata, kamera akan mendeteksi objek di sekitar Anda.</p>';
-    document.getElementById('arStatus').textContent='Mode Demo - Mendeteksi objek simulasi...';
-    arActive=true;
-    let idx=0;
-    clearInterval(arSimInterval);
-    arSimInterval=setInterval(()=>{
-        const obj=arObjects[idx%arObjects.length];idx++;
-        arShowLabel(obj);
-    },2500);
-}
-
-function arShowLabel(obj){
-    const overlay=document.getElementById('arOverlay');
-    // Keep corners and scan line
-    const existing=overlay.querySelectorAll('.ar-label');
-    existing.forEach(l=>l.remove());
-
-    const x=15+Math.random()*55;
-    const y=15+Math.random()*55;
-    const label=document.createElement('div');
-    label.className='ar-label';
-    label.style.left=x+'%';label.style.top=y+'%';
-    label.innerHTML=`<span class="ar-label-dot"></span><strong>${obj.krama}</strong><span class="ar-label-sub">(${obj.indo})</span>`;
-    label.onclick=()=>{notify(`${obj.krama} = ${obj.indo}`,'info');addXP(3);speak(obj.krama,{stopPropagation:()=>{}})};
-    overlay.appendChild(label);
-
-    // Add to detected grid
-    const grid=document.getElementById('arDetected');
-    if(!grid.querySelector(`[data-obj="${obj.obj}"]`)){
-        const item=document.createElement('div');
-        item.className='ar-detected-item';item.setAttribute('data-obj',obj.obj);
-        item.innerHTML=`<div class="ar-det-jawa">${obj.krama}</div><div class="ar-det-indo">${obj.indo}</div>`;
-        item.onclick=()=>speak(obj.krama,{stopPropagation:()=>{}});
-        grid.appendChild(item);
-    }
-}
-
-/* ===== SPEAK ===== */
-function speak(w,e){
-    if(e&&e.stopPropagation)e.stopPropagation();
-    if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(w);u.lang='id-ID';u.rate=0.8;speechSynthesis.speak(u)}
-}
-
-/* ===== REVEAL ===== */
-function initReveal(){
-    const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
-    document.querySelectorAll('.rv:not(.show)').forEach(el=>obs.observe(el));
-}
-
 /* ===== NAVBAR SCROLL ===== */
-addEventListener('scroll',()=>{document.querySelector('.navbar').style.borderBottomColor=scrollY>60?'rgba(201,168,76,0.18)':'rgba(201,168,76,0.08)'},{passive:true});
+addEventListener('scroll',()=>{document.getElementById('navbar').classList.toggle('scrolled',scrollY>50)},{passive:true});
 
-/* ===== EXTRA KEYFRAMES ===== */
+/* ===== PARALLAX ===== */
+addEventListener('scroll',()=>{
+    document.querySelectorAll('.parallax-bg').forEach(el=>{
+        const r=el.parentElement.getBoundingClientRect();
+        const speed=0.3;el.style.transform=`translateY(${r.top*speed}px)`;
+    });
+},{passive:true});
+
+/* ===== INIT APP ===== */
+function initApp(){
+    setWOTD();
+    document.getElementById('streakN').textContent=streak;
+    document.getElementById('xpN').textContent=xp;
+
+    // Show skeletons
+    showSkeleton('tutorSkelWrap',1,'tutor');
+    showSkeleton('fcSkelWrap',1,'flashcard');
+    showSkeleton('storySkelWrap',1,'story');
+    showSkeleton('vocabSkelWrap',6,'grid');
+
+    // Simulate loading then show real content
+    setTimeout(()=>{hideSkeleton('tutorSkelWrap','tutorContent');initReveal()},800);
+    setTimeout(()=>{hideSkeleton('fcSkelWrap','fcReal');initFC()},1200);
+    setTimeout(()=>{hideSkeleton('storySkelWrap','storyReal');initStory()},1600);
+    setTimeout(()=>{hideSkeleton('vocabSkelWrap','vocabGrid');buildVocab();initReveal()},2000);
+
+    setTimeout(()=>notify('Sugeng rawuh! Selamat belajar!','success'),1500);
+}
+
+/* ===== MICRO: Ripple on buttons ===== */
+document.addEventListener('click',e=>{
+    const btn=e.target.closest('.btn-gold,.btn-outline,.tut-topic,.fc-btn,.story-choice,.speak-btn');
+    if(!btn)return;
+    const r=btn.getBoundingClientRect();
+    const ripple=document.createElement('span');
+    const s=Math.max(r.width,r.height);
+    ripple.style.cssText=`position:absolute;width:${s}px;height:${s}px;left:${e.clientX-r.left-s/2}px;top:${e.clientY-r.top-s/2}px;background:rgba(255,255,255,0.15);border-radius:50%;transform:scale(0);animation:rippleA 0.5s ease-out;pointer-events:none`;
+    btn.style.position='relative';btn.style.overflow='hidden';
+    btn.appendChild(ripple);setTimeout(()=>ripple.remove(),500);
+});
+
+/* EXTRA KEYFRAMES */
 const sty=document.createElement('style');
-sty.textContent=`@keyframes confUp{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(-90vh) rotate(540deg);opacity:0}}`;
+sty.textContent=`
+@keyframes confUp{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(-90vh) rotate(540deg);opacity:0}}
+@keyframes rippleA{to{transform:scale(4);opacity:0}}
+@keyframes obFloat{0%{opacity:0;transform:translateY(20px) scale(0)}50%{opacity:0.5;transform:translateY(-30px) scale(1)}100%{opacity:0;transform:translateY(-60px) scale(0)}}
+`;
 document.head.appendChild(sty);
 </script>
 </body>
